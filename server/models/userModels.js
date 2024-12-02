@@ -1,5 +1,5 @@
 import mongoose, { Schema } from "mongoose";
-//jjjj
+
 const userSchema = new mongoose.Schema({
   username: {
     type: String,
@@ -11,13 +11,13 @@ const userSchema = new mongoose.Schema({
     required: true,
     unique: true
   },
-  posts: [{
+  password: {
+    type: String,
+    required: true
+  },
+  friends: [{
     type: Schema.Types.ObjectId,
-    ref: 'Post'
-  }],
-  comments: [{
-    type: Schema.Types.ObjectId,
-    ref: 'Comment'
+    ref: 'User' 
   }]
 }, {
   timestamps: true

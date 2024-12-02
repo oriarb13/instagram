@@ -8,10 +8,6 @@ content: {
 photo: {
   type: String
 },
-comments: [{
-  type: Schema.Types.ObjectId,
-  ref: 'Comment'
-}],
 posterId: {
   type: Schema.Types.ObjectId,
   ref: 'User',

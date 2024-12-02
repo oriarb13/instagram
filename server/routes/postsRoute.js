@@ -1,23 +1,39 @@
-import express from "express"; 
+import express from "express";
 import { 
   getAllPosts, 
   getPostById, 
   createPost, 
   updatePost, 
-  deletePost 
-} from "../controllers/postController.js"; 
+  deletePost, 
+  getPostsByUsername, 
+  getPostsFromFriends,
+  getUsersWhoLikedPost 
+} from "../controllers/postController.js";
 
-const router = express.Router(); 
+const router = express.Router();
 
-//get all
+//  all posts
 router.get("/", getAllPosts);
-//by id
-router.get("/:id", getPostById); 
-//create
-router.post("/", createPost); 
-//edit
-router.patch("/:id", updatePost); 
-//delete
-router.delete("/:id", deletePost); 
 
-export default router; 
+// post by id
+router.get("/:id", getPostById);
+
+// post by username
+router.get("/user/:username", getPostsByUsername);
+
+//  posts of friends
+router.get("/friends/:username", getPostsFromFriends);
+
+//  users  liked 
+router.get("/:id/likes", getUsersWhoLikedPost);
+
+// Create a new post
+router.post("/", createPost);
+
+// Update a post by ID
+router.patch("/:id", updatePost);
+
+// Delete a post by ID
+router.delete("/:id", deletePost);
+
+export default router;
