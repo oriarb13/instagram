@@ -4,20 +4,28 @@ import {
   getCommentById, 
   createComment, 
   updateComment, 
-  deleteComment 
+  deleteComment, 
+  getCommentsByPostId 
 } from "../controllers/commentController.js"; 
 
 const router = express.Router(); 
 
-//get all
+// Get all comments
 router.get("/", getAllComments);
-//by id
-router.get("/:id", getCommentById); 
-//create
+
+// Get comment by ID
+router.get("/:id", getCommentById);
+
+// Get all comments by post ID
+router.get("/post/:id", getCommentsByPostId);
+
+// Create a new comment
 router.post("/", createComment); 
-//edit
+
+// Update an existing comment
 router.patch("/:id", updateComment); 
-//delete
+
+// Delete a comment by ID
 router.delete("/:id", deleteComment); 
 
-export default router; 
+export default router;
