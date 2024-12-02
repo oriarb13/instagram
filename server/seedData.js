@@ -3,14 +3,14 @@ import User from "./models/userModels.js";
 import Post from "./models/postModel.js";
 import Comment from "./models/commentModel.js";
 
-// MongoDB connection string
-const mongoURI = "mongodb://localhost:27017/instagram"; // שנה לפי הצורך
+// MongoDB connection string for Atlas
+const mongoURI = "mongodb+srv://oriarb13690:oriarb13690@cluster0.ys1qc.mongodb.net/project?retryWrites=true&w=majority&appName=Cluster0"; // שים לב שהקישור שלך הוא לאותו הפורמט
 
 // Create dummy data for seeding
 const createDummyData = async () => {
   try {
     // Connect to the database
-    await mongoose.connect(mongoURI);
+    await mongoose.connect(mongoURI, { useNewUrlParser: true, useUnifiedTopology: true });
     console.log("Connected to the database");
 
     // Clear existing data to avoid duplicates

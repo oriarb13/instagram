@@ -1,11 +1,10 @@
 import Post from "../models/postModel.js"; 
 import Comment from "../models/commentModel.js";
-import User from "../models/userModels.js";
 
 // Get all comments
 export const getAllComments = async (req, res) => {
   try {
-    const comments = await Comment.find(); 
+    const comments = await Comment.find().populate("userId", "username email");//give user data too
     if (comments.length === 0) { 
       return res.status(404).json({ message: "No comments found." });     
     }
@@ -19,7 +18,7 @@ export const getAllComments = async (req, res) => {
 // Get comment by ID
 export const getCommentById = async (req, res) => {
   try {
-    const comment = await Comment.findById(req.params.id); 
+    const comment = await Comment.findById(req.params.id).populate("userId", "username email"); 
     if (!comment) { 
       return res.status(404).json({ error: "Comment not found." });     
     }
@@ -58,7 +57,7 @@ export const createComment = async (req, res) => {
   }
 };
 
-// Update an existing comment
+// Update a comment
 export const updateComment = async (req, res) => {
   try {
     const updatedComment = await Comment.findByIdAndUpdate(req.params.id, req.body, { new: true, runValidators: true }); 
@@ -79,15 +78,6 @@ export const deleteComment = async (req, res) => {
     if (!commentToDelete) { 
       return res.status(404).json({ error: "Comment not found." });     
     }
-
-    // Get the post
-    const post = await Post.findById(commentToDelete.postId);
-
-    // Remove comment from the post 
-    post.comments = post.comments.filter(commentId => commentId.toString() !== commentToDelete._id.toString());
-    await post.save();
-
-    // Delete the comment
     const deletedComment = await Comment.findByIdAndDelete(req.params.id);
 
     res.status(200).json({ message: "Comment deleted successfully", comment: deletedComment });     
@@ -97,10 +87,11 @@ export const deleteComment = async (req, res) => {
   }
 };
 
-// Get all comments by a specific post ID
+// Get all comments of specific post 
 export const getCommentsByPostId = async (req, res) => {
   try {
-    const comments = await Comment.find({ postId: req.params.id }).populate("userId", "username email");
+    const comments = await Comment.find({ postId: req.params.id })
+      .populate("userId", "username email");
 
     if (comments.length === 0) {
       return res.status(404).json({ message: "No comments found for this post." });

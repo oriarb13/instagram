@@ -47,7 +47,7 @@ app.get("/api/status", (req, res) => {
 });
 
 //use posts
-app.use("/api/posts",authUser, postsRoutes);
+app.use("/api/posts", postsRoutes);
 
 //use users
 app.use("/api/users",authUser, usersRoutes);

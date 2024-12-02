@@ -33,7 +33,7 @@ export const getUserByUsername = async (req, res) => {
 // Get a specific user's friends by username
 export const getUserFriends = async (req, res) => {
   try {
-    const user = await User.findOne({ username: req.params.username }).populate('friends', 'username email');
+    const user = await User.findOne({ username: req.params.username }).populate('friends', 'username email');//get the user, then get the data of his friends
     
     if (!user) {
       return res.status(404).json({ message: "User not found." });
@@ -46,30 +46,28 @@ export const getUserFriends = async (req, res) => {
   }
 };
 
-// Add a friend (send a friend request)
+// Add a friend 
 export const sendFriendRequest = async (req, res) => {
-  const { targetUsername } = req.body;
-  const { username } = req.params;
+  const { targetUsername } = req.body; //from the body
+  const { username } = req.params; //from the call
 
   try {
-    const user = await User.findOne({ username });
-    const targetUser = await User.findOne({ username: targetUsername });
+    const user = await User.findOne({ username }); //get our user
+    const targetUser = await User.findOne({ username: targetUsername });//get the target
 
     if (!user || !targetUser) {
       return res.status(404).json({ error: "User or target user not found." });
     }
 
-    // Check if already friends
+    // already friends?
     if (user.friends.includes(targetUser._id)) {
       return res.status(400).json({ message: "Already friends." });
     }
 
-    // Add target user to the friends list of the current user
-    user.friends.push(targetUser._id);
-    await user.save();
+    user.friends.push(targetUser._id); //add to the friendlist
+    await user.save(); 
 
-    // Optionally: Add the current user to the target user's friends as well (mutual friendship)
-    targetUser.friends.push(user._id);
+    targetUser.friends.push(user._id);//add to the target user fiendlist too
     await targetUser.save();
 
     res.status(200).json({ message: "Friend request sent successfully." });
@@ -92,16 +90,13 @@ export const removeFriend = async (req, res) => {
       return res.status(404).json({ error: "User or target user not found." });
     }
 
-    // Check if they are friends
     if (!user.friends.includes(targetUser._id)) {
       return res.status(400).json({ message: "Not friends." });
     }
 
-    // Remove target user from the current user's friends list
     user.friends = user.friends.filter(friendId => friendId.toString() !== targetUser._id.toString());
     await user.save();
 
-    // Remove the current user from the target user's friends list
     targetUser.friends = targetUser.friends.filter(friendId => friendId.toString() !== user._id.toString());
     await targetUser.save();
 
@@ -154,7 +149,7 @@ export const updateUser = async (req, res) => {
     }
 
     if (req.body.username) {
-      await Post.updateMany({ posterUsername: req.params.username }, { $set: { "posterUsername": updatedUser.username } });
+      await Post.updateMany({ posterUsername: req.params.username }, { $set: { "posterUsername": updatedUser.username } });//update poster name
       await Comment.updateMany({ userUsername: req.params.username }, { $set: { "userUsername": updatedUser.username } });
     }
 

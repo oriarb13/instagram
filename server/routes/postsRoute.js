@@ -12,19 +12,19 @@ import {
 
 const router = express.Router();
 
-// Get all posts
+//  all posts
 router.get("/", getAllPosts);
 
-// Get a post by ID
+// post by id
 router.get("/:id", getPostById);
 
-// Get all posts by a specific username
+// post by username
 router.get("/user/:username", getPostsByUsername);
 
-// Get all posts from friends of a specific user
+//  posts of friends
 router.get("/friends/:username", getPostsFromFriends);
 
-// Get all users who liked a post
+//  users  liked 
 router.get("/:id/likes", getUsersWhoLikedPost);
 
 // Create a new post
