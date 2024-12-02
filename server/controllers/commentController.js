@@ -32,7 +32,8 @@ export const getCommentById = async (req, res) => {
 
 // Create a new comment
 export const createComment = async (req, res) => {
-  const { comContent, comLikes, userId, postId } = req.body; 
+  const { comContent, userId, postId } = req.body; 
+  
   if (!comContent || !userId || !postId) { 
     return res.status(400).json({ error: "Content, user, and postId are required." });     
   }
@@ -40,7 +41,6 @@ export const createComment = async (req, res) => {
   try {
     const newComment = new Comment({
       comContent,
-      comLikes,
       userId,
       postId,
     });
@@ -48,8 +48,8 @@ export const createComment = async (req, res) => {
     await newComment.save();
 
     const post = await Post.findById(postId);
-    post.comments.push(newComment._id);    ////////////////////////////////////
-    await post.save();   /////////////
+    post.comments.push(newComment._id);  
+    await post.save();
 
     res.status(201).json({ message: "Comment created successfully!", comment: newComment });     
   } catch (error) {
@@ -94,5 +94,21 @@ export const deleteComment = async (req, res) => {
   } catch (error) {
     console.error("Error deleting comment:", error); 
     res.status(500).json({ error: "Server error." });   
+  }
+};
+
+// Get all comments by a specific post ID
+export const getCommentsByPostId = async (req, res) => {
+  try {
+    const comments = await Comment.find({ postId: req.params.id }).populate("userId", "username email");
+
+    if (comments.length === 0) {
+      return res.status(404).json({ message: "No comments found for this post." });
+    }
+
+    res.status(200).json(comments);
+  } catch (error) {
+    console.error("Error fetching comments by post ID:", error);
+    res.status(500).json({ error: "Server error." });
   }
 };

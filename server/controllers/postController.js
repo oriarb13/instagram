@@ -19,7 +19,10 @@ export const getAllPosts = async (req, res) => {
 // Get post by ID
 export const getPostById = async (req, res) => {
   try {
-    const post = await Post.findById(req.params.id); 
+    const post = await Post.findById(req.params.id)
+      .populate("comments")
+      .populate("likedBy", "username email");
+    
     if (!post) { 
       return res.status(404).json({ error: "Post not found." });     
     }
@@ -32,7 +35,7 @@ export const getPostById = async (req, res) => {
 
 // Create a new post
 export const createPost = async (req, res) => {
-  const { content, photo, posterId, comments } = req.body; 
+  const { content, photo, posterId } = req.body; 
   
   if (!content || !posterId) { 
     return res.status(400).json({ error: "Content and posterId are required." });     
@@ -42,13 +45,11 @@ export const createPost = async (req, res) => {
     const newPost = new Post({
       content,
       photo,
-      comments: comments || [],
       posterId,
     });
 
     await newPost.save(); 
     
-    // Update user with post ID
     const user = await User.findById(posterId);
     user.posts.push(newPost._id);
     await user.save();
@@ -60,7 +61,7 @@ export const createPost = async (req, res) => {
   }
 };
 
-// Update  post
+// Update a post by ID
 export const updatePost = async (req, res) => {
   try {
     const updatedPost = await Post.findByIdAndUpdate(req.params.id, req.body, { new: true, runValidators: true }); 
@@ -78,22 +79,18 @@ export const updatePost = async (req, res) => {
 // Delete a post by ID
 export const deletePost = async (req, res) => {
   try {
-    // post exist?
     const post = await Post.findById(req.params.id);
     if (!post) {
       return res.status(404).json({ error: "Post not found." });
     }
 
-    // Delete comments 
     await Comment.deleteMany({ postId: post._id });
 
-    // Delete
     const deletedPost = await Post.findByIdAndDelete(req.params.id); 
     if (!deletedPost) { 
       return res.status(404).json({ error: "Post not found." });     
     }
 
-    // Update user to remove postId (optional)
     const user = await User.findById(post.posterId);
     user.posts = user.posts.filter(postId => postId.toString() !== post._id.toString());
     await user.save();
@@ -102,5 +99,76 @@ export const deletePost = async (req, res) => {
   } catch (error) {
     console.error("Error deleting post:", error); 
     res.status(500).json({ error: "Server error." });   
+  }
+};
+
+// Get all posts by a specific username
+export const getPostsByUsername = async (req, res) => {
+  try {
+    const user = await User.findOne({ username: req.params.username });
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found." });
+    }
+
+    const posts = await Post.find({ posterId: user._id })
+      .populate("comments")
+      .populate("likedBy", "username email");
+
+    if (posts.length === 0) {
+      return res.status(404).json({ message: "No posts found for this user." });
+    }
+
+    res.status(200).json(posts);
+  } catch (error) {
+    console.error("Error fetching posts by username:", error);
+    res.status(500).json({ error: "Server error." });
+  }
+};
+
+
+// Get all users who liked a post
+export const getUsersWhoLikedPost = async (req, res) => {
+  try {
+    const post = await Post.findById(req.params.id).populate('likedBy', 'username email');
+
+    if (!post) {
+      return res.status(404).json({ error: "Post not found." });
+    }
+
+    const usersWhoLiked = post.likedBy;
+
+    res.status(200).json(usersWhoLiked);
+  } catch (error) {
+    console.error("Error fetching users who liked the post:", error);
+    res.status(500).json({ error: "Server error." });
+  }
+};
+
+// Get all posts from friends of a specific user
+export const getPostsFromFriends = async (req, res) => {
+  try {
+    // Find user by username
+    const user = await User.findOne({ username: req.params.username }).populate("friends");
+    if (!user) {
+      return res.status(404).json({ error: "User not found." });
+    }
+
+    // Get all friend IDs
+    const friendsIds = user.friends.map(friend => friend._id);
+
+    // Get posts from friends
+    const posts = await Post.find({ posterId: { $in: friendsIds } })
+      .populate("comments")
+      .populate("likedBy", "username email");
+
+    if (posts.length === 0) {
+      return res.status(404).json({ message: "No posts found from friends." });
+    }
+
+    res.status(200).json(posts);
+  } catch (error) {
+    console.error("Error fetching posts from friends:", error);
+    res.status(500).json({ error: "Server error." });
   }
 };
