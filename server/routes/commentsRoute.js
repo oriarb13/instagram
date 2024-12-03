@@ -8,6 +8,9 @@ import {
   getCommentsByPostId 
 } from "../controllers/commentController.js"; 
 
+import verifyToken from "../middleware/auth.js";
+
+
 const router = express.Router(); 
 
 // Get all comments
@@ -20,12 +23,12 @@ router.get("/:id", getCommentById);
 router.get("/post/:id", getCommentsByPostId);
 
 // Create a new comment
-router.post("/", createComment); 
+router.post("/",verifyToken, createComment); 
 
 // Update an existing comment
-router.patch("/:id", updateComment); 
+router.patch("/:id",verifyToken, updateComment); 
 
 // Delete a comment by ID
-router.delete("/:id", deleteComment); 
+router.delete("/:id",verifyToken, deleteComment); 
 
 export default router;

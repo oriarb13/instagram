@@ -3,37 +3,39 @@ import {
   getAllPosts, 
   getPostById, 
   createPost, 
-  updatePost, 
   deletePost, 
   getPostsByUsername, 
   getPostsFromFriends,
-  getUsersWhoLikedPost 
+  getUsersWhoLikedPost,
+  toggleLikePost
 } from "../controllers/postController.js";
+
+import verifyToken from "../middleware/auth.js";
 
 const router = express.Router();
 
 //  all posts
-router.get("/", getAllPosts);
+router.get("/", getAllPosts); 
 
-// post by id
-router.get("/:id", getPostById);
+// post by post id
+router.get("/:id", getPostById); 
 
-// post by username
-router.get("/user/:username", getPostsByUsername);
+// posts by username
+router.get("/user/:username", getPostsByUsername); 
 
 //  posts of friends
-router.get("/friends/:username", getPostsFromFriends);
+router.get("/friends/:username", getPostsFromFriends); 
 
-//  users  liked 
-router.get("/:id/likes", getUsersWhoLikedPost);
+//  users who liked
+router.get("/:id/likes", getUsersWhoLikedPost); 
 
 // Create a new post
-router.post("/", createPost);
-
-// Update a post by ID
-router.patch("/:id", updatePost);
+router.post("/", verifyToken, createPost); 
 
 // Delete a post by ID
-router.delete("/:id", deletePost);
+router.delete("/:id", verifyToken, deletePost); 
+
+// Toggle like on a post
+router.post("/:id/like", verifyToken, toggleLikePost); 
 
 export default router;
