@@ -1,6 +1,102 @@
 import User from "../models/userModels.js";
 import Post from "../models/postModel.js";
 import Comment from "../models/commentModel.js";
+import JWT from "jsonwebtoken";
+//jwt 
+import { hashPassword, comparePassword } from "../utils/AUTH.js";
+const JWT_EXPIRATION = { expiresIn: "1h" };
+
+//token validation
+export const TokenValid = (req, res) => {
+  try {
+    res.status(200).send({
+      username: req.user.username,
+    });
+  } catch (error) {
+    res
+      .status(500)
+      .send({ error: "Something went wrong. Please try again later." });
+    }
+  };
+  
+  //create user
+export const createNewUser = async (req, res) => {
+  try {
+    const { username, email, password } = req.body;
+    if (!username || !password || !email) {
+      return res
+        .status(400)
+        .send({ error: "email ,username and password are required" });
+    }
+    const existingUser = await User.findOne({ $or: [{ username }, { email }] });
+    if (existingUser) {
+      return res
+        .status(400)
+        .json({ message: "Username or email already exists" });
+    }
+
+    const hashedPassword = await hashPassword(password);
+    const newUser = new User({
+      username,
+      email,
+      password: hashedPassword,
+    });
+
+    await newUser.save();
+    res.status(201).send({
+      status: "success",
+      message: "User register successfully",
+      data: newUser,
+    });
+  } catch (error) {
+    res.status(500).send(error);
+  }
+};
+
+//sign in 
+export const singInUser = async (req, res) => {
+  const { username, email, password } = req.body;
+  if (!password || (!email && !username)) {
+    return res
+      .status(400)
+      .send({ error: "email/username and password is required" });
+  }
+  try {
+    const foundUser = await User.findOne({
+      $or: [{ username: req.body.username }, { email: req.body.email }],
+    });
+    if (!foundUser) {
+      return res.status(404).send({ error: "Email or username not found." });
+    }
+
+    const isAuth = await comparePassword(password, foundUser.password);
+    if (!isAuth) {
+      return res.status(401).send({ error: "Invalid password." });
+    }
+
+    const { _id, username, email, createdAt } = foundUser;
+    const filteredUser = { _id, username, email, createdAt };
+
+    const token = JWT.sign(filteredUser, process.env.JWT_KEY, JWT_EXPIRATION);
+
+    res.cookie("jwt", token, {
+      httpOnly: false,
+      secure: true,
+      sameSite: "strict",
+      maxAge: 3600000,
+    });
+    res.status(200).send({
+      message: "Authentication successful",
+      isAuth: true,
+      username: username,
+    });
+  } catch (error) {
+    console.error("Sign-in error:", error);
+    res
+      .status(500)
+      .send({ error: "Something went wrong. Please try again later." });
+  }
+};
 
 // Get all users
 export const getAllUsers = async (req, res) => {
@@ -46,28 +142,26 @@ export const getUserFriends = async (req, res) => {
   }
 };
 
-// Add a friend 
+// Add a friend
 export const sendFriendRequest = async (req, res) => {
-  const { targetUsername } = req.body; //from the body
-  const { username } = req.params; //from the call
+  const { targetUserId } = req.body;
+  const userId = req.user._id;
 
   try {
-    const user = await User.findOne({ username }); //get our user
-    const targetUser = await User.findOne({ username: targetUsername });//get the target
+    const user = await User.findById(userId);
+    const targetUser = await User.findById(targetUserId);
 
     if (!user || !targetUser) {
       return res.status(404).json({ error: "User or target user not found." });
     }
-
-    // already friends?
     if (user.friends.includes(targetUser._id)) {
       return res.status(400).json({ message: "Already friends." });
     }
 
-    user.friends.push(targetUser._id); //add to the friendlist
-    await user.save(); 
+    user.friends.push(targetUser._id);
+    await user.save();
 
-    targetUser.friends.push(user._id);//add to the target user fiendlist too
+    targetUser.friends.push(user._id);
     await targetUser.save();
 
     res.status(200).json({ message: "Friend request sent successfully." });
@@ -79,12 +173,12 @@ export const sendFriendRequest = async (req, res) => {
 
 // Remove a friend (unfriend)
 export const removeFriend = async (req, res) => {
-  const { targetUsername } = req.body;
-  const { username } = req.params;
+  const { targetUserId } = req.body;
+  const userId = req.user._id;
 
   try {
-    const user = await User.findOne({ username });
-    const targetUser = await User.findOne({ username: targetUsername });
+    const user = await User.findById(userId);
+    const targetUser = await User.findById(targetUserId);
 
     if (!user || !targetUser) {
       return res.status(404).json({ error: "User or target user not found." });
@@ -107,84 +201,52 @@ export const removeFriend = async (req, res) => {
   }
 };
 
-// Create a new user
-export const createUser = async (req, res) => {
-  const { username, email, password } = req.body;  
-  
-  if (!username || !email || !password) { 
-    return res.status(400).json({ error: "Username, email, and password are required." });     
-  }
-  
-  try {
-    const existingUser = await User.findOne({ $or: [{ username }, { email }] });
-    if (existingUser) {
-      return res.status(400).json({ error: "Username or email already exists." });
-    }
-
-    const newUser = new User({
-      username,
-      email,
-      password,
-    });
-
-    await newUser.save(); 
-    res.status(201).json({ message: "User created successfully!", user: newUser });     
-  } catch (error) {
-    console.error("Error saving new user:", error); 
-    res.status(500).json({ error: "Server error." });   
-  }
-};
 
 // Update an existing user by username
 export const updateUser = async (req, res) => {
   try {
-    const updatedUser = await User.findOneAndUpdate(
-      { username: req.params.username },
-      req.body,
-      { new: true, runValidators: true }
-    ); 
-    
-    if (!updatedUser) { 
-      return res.status(404).json({ error: "User not found." });     
-    }
+    const { newUsername, newEmail } = req.body;
+    const id = req.user._id;
+    const updateData = {};
+    if (newUsername) updateData.username = newUsername;
+    if (newEmail) updateData.email = newEmail;
 
-    if (req.body.username) {
-      await Post.updateMany({ posterUsername: req.params.username }, { $set: { "posterUsername": updatedUser.username } });//update poster name
-      await Comment.updateMany({ userUsername: req.params.username }, { $set: { "userUsername": updatedUser.username } });
-    }
-
-    res.status(200).json({ message: "User updated successfully", user: updatedUser });     
+    const updatedUser = await User.findByIdAndUpdate(id, updateData, {
+      new: true,
+    });
+    res.status(201).send({
+      message: "user updated successfully",
+      updatedUser,
+    });
   } catch (error) {
-    console.error("Error updating user:", error); 
-    res.status(500).json({ error: "Server error." });   
+    console.error("Error updating user", error);
+    res.status(500).json({ error: "Server error" });
   }
 };
 
 // Delete a user by username
 export const deleteUser = async (req, res) => {
+  const id = req.user._id;
+
   try {
-    // Delete user's comments
-    await Comment.deleteMany({ userUsername: req.params.username });
+    await Comment.deleteMany({ userId: id });
 
-    // Get all posts of the user
-    const userPosts = await Post.find({ posterUsername: req.params.username });
+    const userPosts = await Post.find({ posterId: id });
 
-    // Delete comments related to the user's posts
     await Comment.deleteMany({ postId: { $in: userPosts.map(post => post._id) } });
 
-    // Delete the user's posts
-    await Post.deleteMany({ posterUsername: req.params.username });
+    await Post.deleteMany({ posterId: id });
 
-    // Delete the user
-    const deletedUser = await User.findOneAndDelete({ username: req.params.username }); 
+    const deletedUser = await User.findByIdAndDelete(id);
     
-    if (!deletedUser) { 
-      return res.status(404).json({ error: "User not found." });     
+    if (!deletedUser) {
+      return res.status(404).json({ error: "User not found." });
     }
-    
-    res.status(200).json({ message: "User and related posts and comments deleted successfully", user: deletedUser });     
+
+    res.status(200).json({ message: "User and related posts and comments deleted successfully", user: deletedUser });
   } catch (error) {
-    console.error("Error deleting user:", error); 
-    res.status(500).json({ error: "Server error." });   
+    console.error("Error deleting user:", error);
+    res.status(500).json({ error: "Server error." });
   }
 };
+

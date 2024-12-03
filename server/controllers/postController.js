@@ -34,61 +34,59 @@ export const getPostById = async (req, res) => {
 
 // Create post
 export const createPost = async (req, res) => {
-  const { content, photo, posterId } = req.body; 
+  const { content, photo} = req.body; 
   
-  if (!content || !posterId) { 
-    return res.status(400).json({ error: "Content and posterId are required." });     
+  if (!content) { 
+    return res.status(400).json({ error: "Content is required." });     
   }
-  
+  const userId = req.user._id;
+  const username = req.user.username;
+
   try {
     const newPost = new Post({
       content,
       photo,
-      posterId,
+      posterId: userId, 
+      username: username, 
+      likedBy:[] 
     });
 
-    await newPost.save(); 
-    
-    const user = await User.findById(posterId);
-    user.posts.push(newPost._id);
-    await user.save();
-
-    res.status(201).json({ message: "Post created successfully!", post: newPost });     
+    const savedPost = await newPost.save();
+    res.status(201).send({
+      status: "Post successfully created",
+      savedPost,
+    });
   } catch (error) {
-    console.error("Error saving new post:", error); 
-    res.status(500).json({ error: "Server error." });   
+    console.error("Error creating post:", error);
+    res.status(500).json({ error: "Server error. Could not create post." });
   }
 };
 
-// Update post by ID
-export const updatePost = async (req, res) => {
-  try {
-    const updatedPost = await Post.findByIdAndUpdate(req.params.id, req.body, { new: true, runValidators: true }); 
-    if (!updatedPost) { 
-      return res.status(404).json({ error: "Post not found." });     
-    }
-
-    res.status(200).json({ message: "Post updated successfully", post: updatedPost });     
-  } catch (error) {
-    console.error("Error updating post:", error); 
-    res.status(500).json({ error: "Server error." });   
-  }
-};
 
 // Delete a post by ID
 export const deletePost = async (req, res) => {
-  try {
-    const post = await Post.findByIdAndDelete(req.params.id); 
-
-    if (!post) {
-      return res.status(404).json({ error: "Post not found." });
-    }
-
-    res.status(200).json({ message: "Post deleted successfully", post });
-  } catch (error) {
-    console.error("Error deleting post:", error); 
-    res.status(500).json({ error: "Server error." });   
+  const { id } = req.params;
+  const userId = req.user._id;
+  const postById = await Post.findById(id);
+  if (!postById) {
+    return res.status(404).send({ error: "post not found" });
   }
+  if (userId.equals(postById.posterId)) {
+    try {
+      const deletePost = await Post.findByIdAndDelete(id);
+      res.status(200).send({
+        message: "post deleted successfully",
+        deletePost,
+      });
+    } catch (error) {
+      console.error("Error finding post by ID:", error);
+      res.status(500).json({ error: "Server error" });
+    }
+  } else
+    res.status(400).send({
+      status: "failed",
+      mes: "only user that created the post can delete him",
+    });
 };
 
 
@@ -153,6 +151,34 @@ export const getPostsFromFriends = async (req, res) => {
     res.status(200).json(posts);
   } catch (error) {
     console.error("Error fetching posts from friends:", error);
+    res.status(500).json({ error: "Server error." });
+  }
+};
+
+
+export const toggleLikePost = async (req, res) => {
+  const { id } = req.params; 
+  const userId = req.user._id; 
+  
+  try {
+    const post = await Post.findById(id); 
+
+    if (!post) {
+      return res.status(404).json({ error: "Post not found." }); 
+    }
+
+    // if already like so unlike
+    if (post.likedBy.includes(userId)) {
+      post.likedBy = post.likedBy.filter(user => user.toString() !== userId.toString());
+    } else {
+    // if didnt like yet so like
+    post.likedBy.push(userId);
+    }
+
+    await post.save(); 
+    res.status(200).json({ message: "Post like toggled successfully.", post }); 
+  } catch (error) {
+    console.error("Error toggling like:", error);
     res.status(500).json({ error: "Server error." });
   }
 };

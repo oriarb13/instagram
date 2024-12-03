@@ -1,17 +1,9 @@
 import express from "express";
-import bcrypt from "bcrypt"
 import cors from 'cors';
 import morgan from "morgan";
 import mongoose from "mongoose";
-import jwt from "jsonwebtoken"
-
 //env
 import dotenv from "dotenv"
-
-//middel
-import authUser from "./middleware/logger.js"
-import logRequest from "../server/middleware/logger.js";
-
 //routes
 import commentsRoutes from "./routes/commentsRoute.js";
 import postsRoutes from "./routes/postsRoute.js";
@@ -19,11 +11,10 @@ import usersRoutes from "./routes/usersRoute.js";
 
 const app = express();
 const PORT = 3000;
-
 dotenv.config()  
 app.use(express.json());
 app.use(morgan("tiny"));
-app.use(logRequest);
+// app.use(logRequest);
 app.use(
   cors({
     origin: "http://localhost:5173", // Your frontend's origin
@@ -50,10 +41,10 @@ app.get("/api/status", (req, res) => {
 app.use("/api/posts", postsRoutes);
 
 //use users
-app.use("/api/users",authUser, usersRoutes);
+app.use("/api/users", usersRoutes);
 
 //use comments
-app.use("/api/comments",authUser, commentsRoutes);
+app.use("/api/comments", commentsRoutes);
 
 //
 app.listen(PORT, () => {

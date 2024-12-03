@@ -2,15 +2,22 @@ import express from "express";
 import { 
   getAllUsers, 
   getUserByUsername, 
-  createUser, 
-  updateUser, 
+  createNewUser,
+  singInUser, 
+  updateUser,
+  TokenValid, 
   deleteUser,
   getUserFriends,
   sendFriendRequest,
   removeFriend
 } from "../controllers/usersControllers.js"; 
 
-const router = express.Router(); 
+import verifyToken from "../middleware/auth.js"
+
+const router = express.Router();
+
+// verifyToken
+router.get("/validateToken", verifyToken, TokenValid);
 
 // Get all users
 router.get("/", getAllUsers);
@@ -22,18 +29,21 @@ router.get("/:username", getUserByUsername);
 router.get("/:username/friends", getUserFriends); 
 
 // Send a friend request
-router.post("/:username/friend", sendFriendRequest);
+router.post("/sendFriendRequest", verifyToken, sendFriendRequest);
 
 // Remove a friend
-router.delete("/:username/friend", removeFriend);
+router.post("/removeFriend", verifyToken, removeFriend);
 
-// Create a new user
-router.post("/", createUser); 
+//create user
+router.post("/signup", createNewUser);   
+
+//connect to user
+router.post("/signIn", singInUser);  
 
 // Update a user by username
-router.patch("/:username", updateUser); 
+router.patch("/updateUser",verifyToken, updateUser); 
 
 // Delete a user by username
-router.delete("/:username", deleteUser); 
+router.delete("/delete",verifyToken, deleteUser); 
 
 export default router; 

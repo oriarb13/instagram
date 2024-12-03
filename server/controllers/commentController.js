@@ -31,12 +31,13 @@ export const getCommentById = async (req, res) => {
 
 // Create a new comment
 export const createComment = async (req, res) => {
-  const { comContent, userId, postId } = req.body; 
-  
-  if (!comContent || !userId || !postId) { 
-    return res.status(400).json({ error: "Content, user, and postId are required." });     
+  const { comContent, postId } = req.body;
+  const userId = req.user._id; 
+
+  if (!comContent || !userId || !postId) {
+    return res.status(400).json({ error: "Content, user, and postId are required." });
   }
-  
+
   try {
     const newComment = new Comment({
       comContent,
@@ -47,45 +48,58 @@ export const createComment = async (req, res) => {
     await newComment.save();
 
     const post = await Post.findById(postId);
-    post.comments.push(newComment._id);  
+    post.comments.push(newComment._id);
     await post.save();
 
-    res.status(201).json({ message: "Comment created successfully!", comment: newComment });     
+    res.status(201).json({ message: "Comment created successfully!", comment: newComment });
   } catch (error) {
-    console.error("Error saving new comment:", error); 
-    res.status(500).json({ error: "Server error." });   
+    console.error("Error saving new comment:", error);
+    res.status(500).json({ error: "Server error." });
   }
 };
 
 // Update a comment
 export const updateComment = async (req, res) => {
+  const userId = req.user._id;
+
   try {
-    const updatedComment = await Comment.findByIdAndUpdate(req.params.id, req.body, { new: true, runValidators: true }); 
-    if (!updatedComment) { 
-      return res.status(404).json({ error: "Comment not found." });     
+    const comment = await Comment.findById(req.params.id);
+    if (!comment) {
+      return res.status(404).json({ error: "Comment not found." });
     }
-    res.status(200).json({ message: "Comment updated successfully", comment: updatedComment });     
+
+    if (comment.userId.toString() !== userId.toString()) {
+      return res.status(403).json({ error: "You are not authorized to update this comment." });
+    }
+
+    const updatedComment = await Comment.findByIdAndUpdate(req.params.id, req.body, { new: true, runValidators: true });
+    res.status(200).json({ message: "Comment updated successfully", comment: updatedComment });
   } catch (error) {
-    console.error("Error updating comment:", error); 
-    res.status(500).json({ error: "Server error." });   
+    console.error("Error updating comment:", error);
+    res.status(500).json({ error: "Server error." });
   }
 };
+
 
 // Delete a comment by ID
 export const deleteComment = async (req, res) => {
+  const userId = req.user._id; 
   try {
     const commentToDelete = await Comment.findById(req.params.id);
-    if (!commentToDelete) { 
-      return res.status(404).json({ error: "Comment not found." });     
+    if (!commentToDelete) {
+      return res.status(404).json({ error: "Comment not found." });
+    }
+    if (commentToDelete.userId.toString() !== userId.toString()) {
+      return res.status(403).json({ error: "You are not authorized to delete this comment." });
     }
     const deletedComment = await Comment.findByIdAndDelete(req.params.id);
-
-    res.status(200).json({ message: "Comment deleted successfully", comment: deletedComment });     
+    res.status(200).json({ message: "Comment deleted successfully", comment: deletedComment });
   } catch (error) {
-    console.error("Error deleting comment:", error); 
-    res.status(500).json({ error: "Server error." });   
+    console.error("Error deleting comment:", error);
+    res.status(500).json({ error: "Server error." });
   }
 };
+
 
 // Get all comments of specific post 
 export const getCommentsByPostId = async (req, res) => {
