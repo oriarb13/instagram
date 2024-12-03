@@ -1,18 +1,18 @@
+import axios from "axios";
+
 import {
     Avatar,
     Box,
     Container,
-    FormControlLabel,
     Paper,
     TextField,
     Typography,
-    Checkbox,
     Button,
     // Grid,
     // Link,
     FormControl,
     IconButton,
-    OutlinedInput,
+    FilledInput,
     InputLabel,
     InputAdornment,
 } from "@mui/material";
@@ -27,15 +27,46 @@ import { useState } from "react";
 
 const Login = () => {
     // const [isLogin, setIsLogin] = useState(true);
-    const handleSubmit = (e) => {
-        e.preventDefault();
-        console.log(usernameInput);
-        console.log(passwordInput);
-    };
-
     //inputs
     const [usernameInput, setUsernameInput] = useState("");
     const [passwordInput, setPasswordInput] = useState("");
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        //empty input error handling
+        setUsernameError(false);
+        setPasswordError(false);
+
+        let hasError = false;
+
+        if (!usernameInput.trim()) {
+            setUsernameError(true);
+            hasError = true;
+        }
+        if (!passwordInput.trim()) {
+            setPasswordError(true);
+            hasError = true;
+        }
+
+        if (hasError) return;
+
+        console.log(usernameInput);
+        console.log(passwordInput);
+
+        try {
+            const response = await axios.post(
+                "http://localhost:3000/sign-in",
+                { username: usernameInput, password: passwordInput },
+                { withCredentials: true }
+            );
+
+            console.log("Response:", response.data);
+            return response.data;
+        } catch (error) {
+            console.error("Error during sign-in:", error);
+        }
+    };
+
     // const [emalInput, setEmailInput] = useState();
 
     //Input Errors
@@ -54,8 +85,8 @@ const Login = () => {
 
     return (
         <Container maxWidth="xs">
-            <Paper elevation={10} sx={{ marginTop: 8, padding: 2 }}>
-                <h1>Auth Page</h1>
+            <Container sx={{ my: 2, padding: 2 }}>
+                <h1>Instagram</h1>
                 <Avatar
                     sx={{
                         mx: "auto",
@@ -70,7 +101,7 @@ const Login = () => {
                 <Typography
                     component="h1"
                     variant="h5"
-                    sx={{ textAlign: "center" }}
+                    sx={{ textAlign: "center", fontWeight: "bold" }}
                 >
                     Sign In
                 </Typography>
@@ -78,33 +109,47 @@ const Login = () => {
                 <Box
                     component="form"
                     onSubmit={handleSubmit}
-                    noValidate
+                    ///?????????????
+                    // noValidate
                     sx={{ mt: 1 }}
                 >
                     <TextField
-                        // id="outlined-basic"
                         label="Enter username"
                         fullWidth
-                        required
-                        variant="outlined"
+                        variant="filled"
                         value={usernameInput}
                         onChange={(e) => setUsernameInput(e.target.value)}
                         autoFocus
-                        sx={{ mb: 2 }}
-                        error={usernameError}
-                        id="outlined-error-helper-text"
-                        helperText="Incorrect entry."
+                        sx={{
+                            input: { color: "white" },
+                            label: { color: "hsl(0, 0%, 66%)" },
+                            mb: 2,
+                            bgcolor: "hsl(0, 0%, 7%)",
+                            border: 1,
+                        }}
+                        error={usernameError} // Displays red border if true
+                        helperText={usernameError ? "Username is required" : ""} // Custom error message
+                        id="filled-error-helper-text"
                     />
-
-                    <FormControl fullWidth sx={{ mb: 2 }} variant="outlined">
+                    <FormControl
+                        fullWidth
+                        sx={{
+                            input: { color: "white" },
+                            label: { color: "hsl(0, 0%, 66%)" },
+                            mb: 2,
+                            bgcolor: "hsl(0, 0%, 7%)",
+                            border: 1,
+                        }}
+                        variant="filled"
+                    >
                         <InputLabel
                             error={passwordError}
-                            htmlFor="outlined-adornment-password"
+                            htmlFor="filled-adornment-password"
                         >
                             Password
                         </InputLabel>
-                        <OutlinedInput
-                            id="outlined-adornment-password"
+                        <FilledInput
+                            id="filled-adornment-password"
                             type={showPassword ? "text" : "password"}
                             value={passwordInput}
                             error={passwordError}
@@ -123,33 +168,41 @@ const Login = () => {
                                         edge="end"
                                     >
                                         {showPassword ? (
-                                            <VisibilityOff />
+                                            <VisibilityOff
+                                                sx={{ color: "white" }}
+                                            />
                                         ) : (
-                                            <Visibility />
+                                            <Visibility
+                                                sx={{ color: "white" }}
+                                            />
                                         )}
                                     </IconButton>
                                 </InputAdornment>
                             }
                             label="Password"
                         />
+                        {passwordError && (
+                            <Typography
+                                variant="body2"
+                                color="error"
+                                sx={{ mt: 1 }}
+                            >
+                                Password is required
+                            </Typography>
+                        )}
                     </FormControl>
-                    <FormControlLabel
-                        control={<Checkbox value="remember" color="primary" />}
-                        label="Remember me"
-                    />
 
                     <Button
                         variant="contained"
                         startIcon={<LoginIcon />}
                         type="submit"
-                        onClick={handleSubmit}
                         fullWidth
                         sx={{ mt: 1 }}
                     >
                         Sign In
                     </Button>
                 </Box>
-            </Paper>
+            </Container>
         </Container>
     );
 };

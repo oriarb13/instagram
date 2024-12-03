@@ -1,4 +1,5 @@
 import AuthForm from "../../components/AuthForm/AuthForm.jsx";
+
 const AuthPage = () => {
     return (
         <>
