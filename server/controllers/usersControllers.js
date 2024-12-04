@@ -58,13 +58,15 @@ export const singInUser = async (req, res) => {
   const { username, email, password } = req.body;
   if (!password || (!email && !username)) {
     return res
-      .status(400)
-      .send({ error: "email/username and password is required" });
+    .status(400)
+    .send({ error: "email/username and password is required" });
   }
+  console.log("Request body:", req.body);
   try {
     const foundUser = await User.findOne({
       $or: [{ username: req.body.username }, { email: req.body.email }],
     });
+    console.log("Found user:", foundUser)
     if (!foundUser) {
       return res.status(404).send({ error: "Email or username not found." });
     }
