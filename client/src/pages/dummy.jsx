@@ -1,11 +1,12 @@
 import { useSelector } from 'react-redux';
-
+import { useCheckIfUserValid } from '../hooks/use-check-if-user-valid';
 const Dummy = () => {
-  // גישה לסטור של המשתמש
-  const user = useSelector(state => state.user);
+
+    useCheckIfUserValid() //token
+  const user = useSelector(state => state.user); //ridux
 
   if (!user || !user.username) {
-    return <div>Loading...</div>;  // אם המידע על המשתמש לא קיים עדיין בסטור
+    return <div>Loading...</div>; 
   }
 
   return (
