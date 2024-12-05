@@ -1,6 +1,4 @@
 import { Box, Container, Paper, Stack } from "@mui/material";
-import { Link } from "react-router-dom";
-
 
 import Login from "./LogIn";
 import Signup from "./SignUp";
