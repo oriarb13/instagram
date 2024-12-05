@@ -1,4 +1,6 @@
 import { Box, Typography } from "@mui/material";
+
+import Posts
 const HomePage = () => {
     return (
         <>
@@ -14,7 +16,7 @@ const HomePage = () => {
                 }}
             >
                 <Typography
-                    variant="h1"
+                    variant="h4"
                     sx={{
                         color: "hsl(0, 0%, 7%)",
                         textShadow: "2px 2px 4px rgba(0, 0, 0, 0.7)",
