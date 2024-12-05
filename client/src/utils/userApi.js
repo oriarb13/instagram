@@ -29,6 +29,34 @@ export const signIn = async (user) => {
   }
 };
 
+export const logOut = async () => {
+  try {
+    const token = Cookies.get("jwt"); 
+    if (token) {
+      const response = await fetch("http://localhost:3000/api/users/logOut", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`, 
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error("Logout failed.");
+      }
+
+      Cookies.remove("jwt");
+
+      return await response.json(); 
+    } else {
+      throw new Error("No token found");
+    }
+  } catch (error) {
+    console.error("Error logging out:", error);
+    throw error;
+  }
+};
+
 export const isUserValid = async () => {
   try {
     const jwt = Cookies.get("jwt");

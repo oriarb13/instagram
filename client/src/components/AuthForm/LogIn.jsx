@@ -73,9 +73,8 @@ const Login = () => {
 
 
         setTimeout(() => {//nevigate to home 
-        //   navigate("/HomePage");
-          navigate("/Dummy");
-        }, 2000);
+          navigate("/home");
+        }, 1500);
         setUsernameInput("");
         setPasswordInput("");
       } else {

@@ -108,6 +108,18 @@ export const singInUser = async (req, res) => {
   }
 };
 
+export const logOut = (req, res) => {
+  res.clearCookie("jwt", {
+    httpOnly: false,  
+    secure: true,   
+    sameSite: "strict",
+    path: "/login",
+  });
+  res.status(200).send({
+    message: "Successfully logged out.",
+  });
+};
+
 
 // Get all users
 export const getAllUsers = async (req, res) => {

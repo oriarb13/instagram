@@ -1,3 +1,5 @@
+// NavBar.js
+
 import * as React from "react";
 import { Link } from "react-router-dom";
 // material mui imports
@@ -14,9 +16,10 @@ import Button from "@mui/material/Button";
 import Tooltip from "@mui/material/Tooltip";
 import MenuItem from "@mui/material/MenuItem";
 import AdbIcon from "@mui/icons-material/Adb";
+import Logout from "./Logout"; // הייבוא של הקומפוננטה
 
-const pages = ["Home", "Discover", "Search", "Create Post"];
-const settings = ["Profile", "Logout"];
+const pages = ["home", "Discover", "Search", "Create Post"];
+const settings = ["Profile", "Logout"];  // שינוי פה - עכשיו הלוגאאוט מתבצע בקומפוננטה Logout
 
 function NavBar() {
     const [anchorElNav, setAnchorElNav] = React.useState(null);
@@ -101,10 +104,8 @@ function NavBar() {
                                 <MenuItem
                                     key={page}
                                     onClick={handleCloseNavMenu}
-                                    component={Link} // Use Link for routing
-                                    to={`/${page
-                                        .toLowerCase()
-                                        .replace(" ", "-")}`}
+                                    component={Link}
+                                    to={`/${page.toLowerCase().replace(" ", "-")}`}
                                 >
                                     <Typography sx={{ textAlign: "center" }}>
                                         {page}
@@ -144,14 +145,8 @@ function NavBar() {
                             <Button
                                 key={page}
                                 onClick={handleCloseNavMenu}
-                                component={Link} // Use Link for routing
-                                to={
-                                    page === "Home"
-                                        ? "/"
-                                        : `/${page
-                                              .toLowerCase()
-                                              .replace(" ", "-")}`
-                                }
+                                component={Link}
+                                to={`/${page.toLowerCase().replace(" ", "-")}`}
                                 sx={{ my: 2, color: "white", display: "block" }}
                             >
                                 {page}
@@ -193,15 +188,19 @@ function NavBar() {
                                     component={Link}
                                     to={
                                         setting === "Logout"
-                                            ? "/auth"
+                                            ? "/login" // הכפתור יהיה מותאם ללוגאאוט
                                             : `/${setting
                                                   .toLowerCase()
                                                   .replace(" ", "-")}`
                                     }
                                 >
-                                    <Typography sx={{ textAlign: "center" }}>
-                                        {setting}
-                                    </Typography>
+                                    {setting === "Logout" ? (
+                                        <Logout /> // הוספת קומפוננטת ה-Logout במקום כפתור
+                                    ) : (
+                                        <Typography sx={{ textAlign: "center" }}>
+                                            {setting}
+                                        </Typography>
+                                    )}
                                 </MenuItem>
                             ))}
                         </Menu>
@@ -211,4 +210,5 @@ function NavBar() {
         </AppBar>
     );
 }
+
 export default NavBar;
