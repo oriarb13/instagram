@@ -3,7 +3,7 @@ import AuthForm from "../../components/AuthForm/AuthForm.jsx";
 const AuthPage = () => {
     return (
         <>
-            <h1>wef</h1>
+            <h1>authpage</h1>
             <AuthForm />
         </>
     );

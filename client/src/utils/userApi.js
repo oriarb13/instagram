@@ -20,7 +20,7 @@ export const signIn = async (user) => {
     const response = await axios.post(`${base_url}/api/users/signIn`, user, {
       withCredentials: true,
     });
-    return response.data;
+    return response.data;    
   } catch (error) {
     return {
       success: false,

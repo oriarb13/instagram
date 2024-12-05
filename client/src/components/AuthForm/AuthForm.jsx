@@ -47,7 +47,15 @@ const AuthForm = () => {
                         padding: 3,
                     }}
                 >
-                    {isLogin ? "Sign up" : "Log in"}
+                    {isLogin ? (
+                        <Link to="/signup" style={{ color: "blue" }}>
+                            Sign Up
+                        </Link>) :
+                        (              
+                        <Link to="/login" style={{ color: "blue" }}>
+                            Log in
+                        </Link>)
+                    }
                 </Box>
             </Stack>
         </Container>

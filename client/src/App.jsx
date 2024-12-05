@@ -13,12 +13,11 @@ function App() {
     return (
         <>
         <BrowserRouter>
-        {/* //כאן אמור להיות הנאבבאר כדי שיהיה בכל הדפים  */}
             <Routes>
+                <Route path="/signup" element={<SignUp />} />
                 <Route path="/" element={<HomePage />} />
                 <Route path="/auth" element={<AuthPage />} />
                 <Route path="/login" element={<Login />} />
-                <Route path="/signup" element={<SignUp />} />
                 <Route path="/dummy" element={<Dummy />} />
                 {/* הוספה של כל הדפים  */}
             </Routes>
