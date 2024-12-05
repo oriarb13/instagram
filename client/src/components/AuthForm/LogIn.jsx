@@ -69,13 +69,13 @@ const Login = () => {
       const response = await signIn({ username: usernameInput, password: passwordInput });
 
       if (response.message === "Authentication successful") {
-        dispatch(setUser(response.username));  // Save username to Redux store
+        dispatch(setUser(response.username,response._id));  // Save username to Redux store
 
+console.log(response);
 
         setTimeout(() => {//nevigate to home 
-        //   navigate("/HomePage");
-          navigate("/Dummy");
-        }, 2000);
+          navigate("/home");
+        }, 1500);
         setUsernameInput("");
         setPasswordInput("");
       } else {

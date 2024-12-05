@@ -9,8 +9,10 @@ import {
   deleteUser,
   getUserFriends,
   sendFriendRequest,
-  removeFriend
+  removeFriend,
+  logOut
 } from "../controllers/usersControllers.js";
+
 
 
 import verifyToken from "../middleware/auth.js"
@@ -49,6 +51,10 @@ router.post("/signup", createNewUser);
 
 //connect to user
 router.post("/signIn", singInUser);  
+
+//logout
+router.post("/logOut",verifyToken,logOut);  
+
 
 
 // Update a user by username

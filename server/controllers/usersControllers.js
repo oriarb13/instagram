@@ -99,6 +99,7 @@ export const singInUser = async (req, res) => {
       message: "Authentication successful",
       isAuth: true,
       username: username,
+      _id:_id
     });
   } catch (error) {
     console.error("Sign-in error:", error);
@@ -106,6 +107,18 @@ export const singInUser = async (req, res) => {
       .status(500)
       .send({ error: "Something went wrong. Please try again later." });
   }
+};
+
+export const logOut = (req, res) => {
+  res.clearCookie("jwt", {
+    httpOnly: false,  
+    secure: true,   
+    sameSite: "strict",
+    path: "/login",
+  });
+  res.status(200).send({
+    message: "Successfully logged out.",
+  });
 };
 
 
