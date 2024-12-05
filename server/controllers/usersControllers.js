@@ -99,6 +99,7 @@ export const singInUser = async (req, res) => {
       message: "Authentication successful",
       isAuth: true,
       username: username,
+      _id:_id
     });
   } catch (error) {
     console.error("Sign-in error:", error);

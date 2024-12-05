@@ -12,7 +12,7 @@ console.log(user);
   return (
     <div>
       <h1>Welcome, {user.username}!</h1>
-      {/* <h2>{user._id}</h2> */}
+      <h2>{user._id}</h2>
     </div>
   );
 };
