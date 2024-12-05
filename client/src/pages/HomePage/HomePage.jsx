@@ -10,7 +10,7 @@ const HomePage = () => {
                     margin: 0,
                     padding: 0,
                     overflow: "hidden",
-                    backgroundColor: "red",
+                    // backgroundColor: "green",
                 }}
             >
                 <Typography
