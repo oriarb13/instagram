@@ -1,4 +1,6 @@
 import * as React from "react";
+import { Link } from "react-router-dom";
+
 import AppBar from "@mui/material/AppBar";
 import Box from "@mui/material/Box";
 import Toolbar from "@mui/material/Toolbar";
@@ -36,7 +38,10 @@ function NavBar() {
     };
 
     return (
-        <AppBar position="static">
+        <AppBar
+            position="fixed"
+            sx={{ bgcolor: "hsl(12, 33%, 10%)", top: 0, width: "100%" }}
+        >
             <Container maxWidth="xl">
                 <Toolbar disableGutters>
                     <AdbIcon
@@ -53,11 +58,11 @@ function NavBar() {
                             fontFamily: "monospace",
                             fontWeight: 700,
                             letterSpacing: ".3rem",
-                            color: "inherit",
+                            color: "hsl(0, 0%, 7%)",
                             textDecoration: "none",
                         }}
                     >
-                        LOGO
+                        Instagram
                     </Typography>
 
                     <Box
@@ -96,6 +101,10 @@ function NavBar() {
                                 <MenuItem
                                     key={page}
                                     onClick={handleCloseNavMenu}
+                                    component={Link} // Use Link for routing
+                                    to={`/${page
+                                        .toLowerCase()
+                                        .replace(" ", "-")}`}
                                 >
                                     <Typography sx={{ textAlign: "center" }}>
                                         {page}
@@ -119,7 +128,7 @@ function NavBar() {
                             fontFamily: "monospace",
                             fontWeight: 700,
                             letterSpacing: ".3rem",
-                            color: "inherit",
+                            color: "hsl(0, 0%, 7%)",
                             textDecoration: "none",
                         }}
                     >
@@ -135,6 +144,14 @@ function NavBar() {
                             <Button
                                 key={page}
                                 onClick={handleCloseNavMenu}
+                                component={Link} // Use Link for routing
+                                to={
+                                    page === "Home"
+                                        ? "/"
+                                        : `/${page
+                                              .toLowerCase()
+                                              .replace(" ", "-")}`
+                                }
                                 sx={{ my: 2, color: "white", display: "block" }}
                             >
                                 {page}
@@ -173,6 +190,14 @@ function NavBar() {
                                 <MenuItem
                                     key={setting}
                                     onClick={handleCloseUserMenu}
+                                    component={Link}
+                                    to={
+                                        setting === "Logout"
+                                            ? "/auth"
+                                            : `/${setting
+                                                  .toLowerCase()
+                                                  .replace(" ", "-")}`
+                                    }
                                 >
                                     <Typography sx={{ textAlign: "center" }}>
                                         {setting}
