@@ -1,6 +1,4 @@
-import React from "react";
 import { Box, Typography } from "@mui/material";
-import NavBar from "../../components/PageLayout/Navbar";
 const HomePage = () => {
     return (
         <>
@@ -9,17 +7,18 @@ const HomePage = () => {
                     height: "100vh",
                     width: "100vw",
                     backgroundSize: "cover",
-                    margin: 0, // Ensure no margins
-                    padding: 0, // Ensure no padding
-                    overflow: "hidden", // Prevent scrolling
+                    margin: 0,
+                    padding: 0,
+                    overflow: "hidden",
+                    backgroundColor: "red",
                 }}
             >
-                <NavBar />
                 <Typography
                     variant="h1"
                     sx={{
-                        color: "white",
+                        color: "hsl(0, 0%, 7%)",
                         textShadow: "2px 2px 4px rgba(0, 0, 0, 0.7)",
+                        textAlign: "center",
                     }}
                 >
                     Welcome to My Homepage
