@@ -66,11 +66,11 @@ export default function PostCard({ post, comments = [] }) {
                     avatar={
                         <Avatar
                             {...stringAvatar(
-                                post.posterId?.name || "Unknown User"
+                                post.posterId?.username || "Unknown User"
                             )}
                         />
                     }
-                    title={post.posterId?.name || "Title not found"}
+                    title={post.posterId?.username || "Title not found"}
                     subheader={new Date(post.createdAt).toLocaleDateString()}
                 />
                 {post.photo && (
