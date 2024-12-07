@@ -1,0 +1,24 @@
+export const timeAgo = (timestamp) => {
+    // Parse the timestamp if it's an ISO string
+    const parsedTimestamp =
+        typeof timestamp === "string" ? Date.parse(timestamp) : timestamp;
+
+    const now = Date.now();
+    const secondsAgo = Math.floor((now - parsedTimestamp) / 1000);
+
+    if (secondsAgo < 60) {
+        return `${secondsAgo}s ago`;
+    } else if (secondsAgo < 3600) {
+        const minutesAgo = Math.floor(secondsAgo / 60);
+        return `${minutesAgo}m ago`;
+    } else if (secondsAgo < 86400) {
+        const hoursAgo = Math.floor(secondsAgo / 3600);
+        return `${hoursAgo}h ago`;
+    } else if (secondsAgo < 604800) {
+        const daysAgo = Math.floor(secondsAgo / 86400);
+        return `${daysAgo}d ago`;
+    } else {
+        const weeksAgo = Math.floor(secondsAgo / 604800);
+        return `${weeksAgo}w ago`;
+    }
+};
