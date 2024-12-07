@@ -4,7 +4,8 @@ import { styled } from '@mui/system';
 import { useSelector } from 'react-redux';
 import { useCheckIfUserValid } from '../../hooks/use-check-if-user-valid';
 import { getUserByUsername } from '../../utils/userApi.js';
-import { getPostsByUsername } from '../../../../server/controllers/postController.js';
+import { getPostsByUsername } from '../../utils/postsApi.js';
+import { sendFriendRequest, removeFriend } from '../../utils/userApi.js';
 
 const ProfileAvatar = styled(Avatar)({
   width: '120px',
@@ -13,44 +14,102 @@ const ProfileAvatar = styled(Avatar)({
   border: '4px solid pink',
 });
 
+const userName = "user1"; //להחליף לפרופס 
 const ProfilePage = () => {
-  useCheckIfUserValid(); // token
-  const [onlineUser, setOnlineUser] = useState(null); // state for the online user
-  const [posts, setPosts] = useState([]); // רשימת הפוסטים של המשתמש השני
+  useCheckIfUserValid();
 
+  const [clickedUser, setClickedUser] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [posts, setPosts] = useState([]);
+  const [reduxUser, setReduxUser] = useState({});
+  const [isFriends, setIsFriends] = useState(false);
 
-  const [loading, setLoading] = useState(true); // state for loading state
-  const [error, setError] = useState(null); // state for error handling
+  const onlineUserFromRedux = useSelector(state => state.user); //redux
 
-  const onlineUserFromRedux = useSelector(state => state.user); // redux user data
-console.log(onlineUserFromRedux.username);
-
-  const Username ="aharon" ;
-
-  // Fetch online user data on component mount
   useEffect(() => {
-    const fetchOnlineUser = async () => {
+    const fetchClickedUser = async () => { //onpage user
       try {
         setLoading(true);
-        const data = await getUserByUsername(Username); // pass username from redux
+        const data = await getUserByUsername(userName);
+        const data2 = await getUserByUsername(onlineUserFromRedux.username);
         console.log(data);
-        
-        if (data) {
-          setOnlineUser(data); // Set the online user data
+        console.log(data2);
+
+        if (data && data2) {
+          setClickedUser(data);
+          setReduxUser(data2);
+          console.log(data);
+          console.log(data2);
         } else {
-          setError(data.error || 'Failed to load user data');
+          setError(data.error || 'Unable to load user data');
         }
       } catch (err) {
-        setError(err.message || 'An error occurred');
+        setError(err.message || 'Error during fetch');
       } finally {
         setLoading(false);
       }
     };
 
-    if (Username) {
-      fetchOnlineUser();
+    if (userName) {
+      fetchClickedUser();
     }
-  }, [Username]);
+  }, [userName, onlineUserFromRedux.username]); 
+
+  //check if they are friends
+  useEffect(() => {
+    if (reduxUser && reduxUser.friends && clickedUser) {
+      const isFriend = reduxUser.friends.some(friend => friend.username === clickedUser.username);
+      setIsFriends(isFriend);
+    }
+  }, [reduxUser, clickedUser]);
+
+
+  //posts list
+  useEffect(() => {
+    if (clickedUser) {
+      const fetchPosts = async () => {
+        try {
+          const postsData = await getPostsByUsername(clickedUser.username);
+          setPosts(postsData);
+        } catch (err) {
+          setError(err.message || 'Error fetching posts');
+        }
+      };
+      fetchPosts();
+    }
+  }, [clickedUser]);
+
+  //add/remove
+  const handleOnClick = async () => {
+    try {
+      if (isFriends) {
+        //remove
+        await removeFriend(clickedUser._id);
+        setClickedUser(prevState => ({
+          ...prevState,
+          friends: prevState.friends.filter(friend => friend.username !== reduxUser.username),
+        }));
+        setReduxUser(prevState => ({
+          ...prevState,
+          friends: prevState.friends.filter(friend => friend.username !== clickedUser.username),
+        }));
+      } else {
+        //add friend
+        await sendFriendRequest(clickedUser._id);
+        setClickedUser(prevState => ({
+          ...prevState,
+          friends: [...prevState.friends, { username: reduxUser.username, _id: reduxUser._id }],
+        }));
+        setReduxUser(prevState => ({
+          ...prevState,
+          friends: [...prevState.friends, { username: clickedUser.username, _id: clickedUser._id }],
+        }));
+      }
+    } catch (err) {
+      setError(err.message || 'Error during friend request');
+    }
+  };
 
   if (loading) {
     return <div>Loading...</div>;
@@ -61,45 +120,39 @@ console.log(onlineUserFromRedux.username);
   }
 
   return (
-    <Box sx={{marginTop: 50, padding: 3 }}>
+    <Box sx={{ marginTop: 50, padding: 3 }}>
       <Grid container spacing={3}>
         <Grid item xs={12} md={4}>
           <Card sx={{ padding: 2, textAlign: 'center' }}>
-            {/* profile page */}
-            <ProfileAvatar alt={onlineUser.username} src={onlineUser.img} />
+            <ProfileAvatar alt={clickedUser.username} src={clickedUser.img} />
             <Typography variant="h6" sx={{ marginTop: 1 }}>
-              {onlineUser.username}
+              {clickedUser.username}
             </Typography>
 
             <Typography variant="body2" color="text.secondary">
-              @{onlineUser.username}
+              @{clickedUser.username}
             </Typography>
 
             <Box sx={{ marginTop: 2, display: 'flex', justifyContent: 'space-around' }}>
               <Box>
-                {/* posts number */}
-                <Typography variant="h6">{11}</Typography>    //from posts call
+                <Typography variant="h6">{posts.length}</Typography>
                 <Typography variant="body2" color="text.secondary">
                   Posts
                 </Typography>
               </Box>
 
               <Box>
-                {/* friends number */}
-                <Typography variant="h6">{onlineUser.friends.length}</Typography>
+                <Typography variant="h6">{clickedUser.friends.length}</Typography>
                 <Typography variant="body2" color="text.secondary">
-                  friends
+                  Friends
                 </Typography>
               </Box>
 
-              {/* add/remove friend */}
-              {onlineUserFromRedux.username === onlineUser.username ? (
-                <div></div> // if it's your own page don't show
+              {onlineUserFromRedux.username === clickedUser.username ? (
+                <div></div> // user own profile
               ) : (
-                <Button variant="outlined" sx={{ marginTop: 3 }}>
-                  {
-                    onlineUser.friends.includes(user.username) ? 'Remove Friend' : 'Add Friend'
-                  }
+                <Button variant="outlined" sx={{ marginTop: 3 }} onClick={handleOnClick}>
+                  {isFriends ? 'Remove Friend' : 'Add Friend'}
                 </Button>
               )}
             </Box>
@@ -107,14 +160,12 @@ console.log(onlineUserFromRedux.username);
         </Grid>
 
         <Grid item xs={12} md={8}>
-          {/* תוכל להוסיף כאן גלריית פוסטים או תמונות */}
           <Grid container spacing={2}>
             {posts.map((post, index) => (
               <Grid item xs={6} sm={4} md={3} key={index}>
                 <Paper sx={{ height: 200, backgroundColor: '#f0f0f0' }}>
-                  {/* פה תוכל להציג את התמונה או הפוסט */}
                   <Typography variant="body2" color="text.secondary" sx={{ padding: 2 }}>
-                    {post}
+                    {post._id}
                   </Typography>
                 </Paper>
               </Grid>

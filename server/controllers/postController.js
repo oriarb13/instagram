@@ -5,7 +5,9 @@ import User from "../models/userModels.js";
 // Get all posts
 export const getAllPosts = async (req, res) => {
   try {
-    const posts = await Post.find(); 
+    const posts = await Post.find()
+    .populate("likedBy", "username email")
+    .populate("posterId","username")
     if (posts.length === 0) { 
       return res.status(404).json({ message: "No posts found." });     
     }
@@ -20,7 +22,8 @@ export const getAllPosts = async (req, res) => {
 export const getPostById = async (req, res) => {
   try {
     const post = await Post.findById(req.params.id)
-      .populate("likedBy", "username email");
+      .populate("likedBy", "username email")
+      .populate("posterId","username")
 
     if (!post) { 
       return res.status(404).json({ error: "Post not found." });     
@@ -93,14 +96,15 @@ export const deletePost = async (req, res) => {
 // posts by username
 export const getPostsByUsername = async (req, res) => {
   try {
-    const user = await User.findOne({ username: req.params.username });
+    const user = await User.findOne({ username: req.params.username })
 
     if (!user) {
       return res.status(404).json({ message: "User not found." });
     }
 
     const posts = await Post.find({ posterId: user._id })
-      .populate("likedBy", "username email"); //details about the likers
+    .populate("likedBy", "username email")
+    .populate("posterId","username")
 
     if (posts.length === 0) {
       return res.status(404).json({ message: "No posts found for this user." });
@@ -135,6 +139,7 @@ export const getUsersWhoLikedPost = async (req, res) => {
 export const getPostsFromFriends = async (req, res) => {
   try {
     const user = await User.findOne({ username: req.params.username }).populate("friends");//get the user 
+    
     if (!user) {
       return res.status(404).json({ error: "User not found." });
     }
@@ -142,7 +147,8 @@ export const getPostsFromFriends = async (req, res) => {
     const friendsIds = user.friends.map(friend => friend._id);//get his friends ids
 
     const posts = await Post.find({ posterId: { $in: friendsIds } })//if some poster id equal to some id of his friends
-      .populate("likedBy", "username email"); //return 
+      .populate("likedBy", "username email") //return 
+      .populate("posterId","username")
 
     if (posts.length === 0) {
       return res.status(404).json({ message: "No posts found from friends." });

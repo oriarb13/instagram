@@ -125,7 +125,8 @@ export const logOut = (req, res) => {
 // Get all users
 export const getAllUsers = async (req, res) => {
   try {
-    const users = await User.find();
+    const users = await User.find()
+    .populate("friends", "username ")
     if (users.length === 0) {
       return res.status(404).json({ message: "No users found." });    
     }
@@ -140,7 +141,9 @@ export const getAllUsers = async (req, res) => {
 // Get a specific user by username
 export const getUserByUsername = async (req, res) => {
   try {
-    const user = await User.findOne({ username: req.params.username });
+    const user = await User.findOne({ username: req.params.username })
+    .populate("friends", "username ")
+
     if (!user) {
       return res.status(404).json({ error: "User not found." });    
     }

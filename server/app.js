@@ -2,12 +2,16 @@ import express from "express";
 import cors from 'cors';
 import morgan from "morgan";
 import mongoose from "mongoose";
+import cookieParser from 'cookie-parser';
 //env
 import dotenv from "dotenv"
 //routes
 import commentsRoutes from "./routes/commentsRoute.js";
 import postsRoutes from "./routes/postsRoute.js";
 import usersRoutes from "./routes/usersRoute.js";
+
+
+
 
 const app = express();
 const PORT = 3000;
@@ -21,6 +25,7 @@ app.use(
     credentials: true, // Enable credentials (cookies, etc.)
   })
 );
+app.use(cookieParser());
 
 //connect mongo
 const uri = process.env.DB_URI;
