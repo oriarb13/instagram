@@ -13,7 +13,6 @@ import Typography from "@mui/material/Typography";
 import FavoriteIcon from "@mui/icons-material/Favorite";
 import ShareIcon from "@mui/icons-material/Share";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
-import MoreVertIcon from "@mui/icons-material/MoreVert";
 
 // Utility functions
 
@@ -71,11 +70,6 @@ export default function PostCard({ post, comments = [] }) {
                             )}
                         />
                     }
-                    action={
-                        <IconButton aria-label="settings">
-                            <MoreVertIcon />
-                        </IconButton>
-                    }
                     title={post.posterId?.name || "Title not found"}
                     subheader={new Date(post.createdAt).toLocaleDateString()}
                 />
@@ -104,9 +98,7 @@ export default function PostCard({ post, comments = [] }) {
                     <IconButton aria-label="add to favorites">
                         <FavoriteIcon />
                     </IconButton>
-                    <IconButton aria-label="share">
-                        <ShareIcon />
-                    </IconButton>
+
                     <ExpandMore
                         expand={expanded}
                         onClick={handleExpandClick}
@@ -124,7 +116,7 @@ export default function PostCard({ post, comments = [] }) {
                                     avatar={
                                         <Avatar
                                             {...stringAvatar(
-                                                comment.posterId?.name ||
+                                                comment.userId?.username ||
                                                     "Unknown User"
                                             )}
                                         />
@@ -134,7 +126,7 @@ export default function PostCard({ post, comments = [] }) {
                                     ).toLocaleDateString()}
                                 />
                                 <Typography sx={{ marginBottom: 2 }}>
-                                    {comment.comcontent ||
+                                    {comment.comContent ||
                                         "No content available"}
                                 </Typography>
                                 <Typography
@@ -142,7 +134,7 @@ export default function PostCard({ post, comments = [] }) {
                                     color="text.secondary"
                                 >
                                     <FavoriteIcon />:{" "}
-                                    {comment.likes?.length || 0}
+                                    {comment.likedBy?.length || 0}
                                 </Typography>
                             </CardContent>
                         ))

@@ -19,7 +19,7 @@ import AdbIcon from "@mui/icons-material/Adb";
 import Logout from "./Logout"; // הייבוא של הקומפוננטה
 
 const pages = ["home", "Discover", "Search", "Create Post"];
-const settings = ["Profile", "Logout"];  // שינוי פה - עכשיו הלוגאאוט מתבצע בקומפוננטה Logout
+const settings = ["Profile", "Logout"]; // שינוי פה - עכשיו הלוגאאוט מתבצע בקומפוננטה Logout
 
 function NavBar() {
     const [anchorElNav, setAnchorElNav] = React.useState(null);
@@ -105,7 +105,9 @@ function NavBar() {
                                     key={page}
                                     onClick={handleCloseNavMenu}
                                     component={Link}
-                                    to={`/${page.toLowerCase().replace(" ", "-")}`}
+                                    to={`/${page
+                                        .toLowerCase()
+                                        .replace(" ", "-")}`}
                                 >
                                     <Typography sx={{ textAlign: "center" }}>
                                         {page}
@@ -197,7 +199,9 @@ function NavBar() {
                                     {setting === "Logout" ? (
                                         <Logout /> // הוספת קומפוננטת ה-Logout במקום כפתור
                                     ) : (
-                                        <Typography sx={{ textAlign: "center" }}>
+                                        <Typography
+                                            sx={{ textAlign: "center" }}
+                                        >
                                             {setting}
                                         </Typography>
                                     )}
