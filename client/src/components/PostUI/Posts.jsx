@@ -12,7 +12,15 @@ export default function PostsList({ posts = [] }) {
     }
 
     return (
-        <Box sx={{ width: "80%" }}>
+        <Box
+            sx={{
+                width: "80%",
+
+                display: "flex",
+                justifyContent: "center",
+                marginBlock: 2,
+            }}
+        >
             <Stack spacing={2}>
                 {posts.map((post) => (
                     <PostCard

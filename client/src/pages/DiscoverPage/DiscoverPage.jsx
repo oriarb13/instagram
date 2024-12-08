@@ -2,6 +2,14 @@ import React, { useState, useEffect } from "react";
 import { getAllPosts } from "../../utils/postsApi.js";
 import { getCommentsByPostId } from "../../utils/commentsApi.js";
 import PostsList from "../../components/PostUI/Posts.jsx";
+import {
+    Container,
+    Typography,
+    CircularProgress,
+    Box,
+    Alert,
+    Paper,
+} from "@mui/material";
 
 export default function DiscoveryPage() {
     const [posts, setPosts] = useState([]);
@@ -11,23 +19,11 @@ export default function DiscoveryPage() {
     useEffect(() => {
         async function fetchData() {
             try {
-                // 1. Get all posts
-                // Ensure getAllPosts() returns an array of post objects.
-                // If it returns { posts: [...] }, adjust accordingly:
-                // const response = await getAllPosts();
-                // const allPosts = response.posts || [];
                 const allPosts = await getAllPosts();
-
-                // 2. For each post, fetch its comments
-                // Ensure getCommentsByPostId(postId) returns an array of comments.
-                // If it returns { comments: [...] }, adjust accordingly:
-                // const response = await getCommentsByPostId(post._id);
-                // const comments = response.comments || [];
 
                 const postsWithComments = await Promise.all(
                     allPosts.map(async (post) => {
                         const comments = await getCommentsByPostId(post._id);
-                        // Make sure comments is an array. If not, default to empty array.
                         return {
                             ...post,
                             comments: Array.isArray(comments) ? comments : [],
@@ -47,14 +43,53 @@ export default function DiscoveryPage() {
         fetchData();
     }, []);
 
-    if (loading) return <div>Loading posts...</div>;
-    if (error) return <div>{error}</div>;
+    if (loading)
+        return (
+            <Container maxWidth="md" sx={{ textAlign: "center", mt: 4 }}>
+                <CircularProgress />
+                <Typography variant="h6" sx={{ mt: 2 }}>
+                    Loading posts...
+                </Typography>
+            </Container>
+        );
 
-    // 3. Pass posts (with comments) to PostsList
+    if (error)
+        return (
+            <Container maxWidth="md" sx={{ mt: 4 }}>
+                <Alert severity="error">{error}</Alert>
+            </Container>
+        );
+
     return (
-        <div>
-            <h1>Discovery Page</h1>
-            <PostsList posts={posts} />
-        </div>
+        <Container
+            maxWidth="lg"
+            sx={{
+                mt: 4,
+
+                borderRadius: 2,
+                p: 4,
+            }}
+        >
+            <Paper elevation={3} sx={{ p: 4, borderRadius: 2 }}>
+                <Typography
+                    variant="h4"
+                    align="center"
+                    gutterBottom
+                    sx={{ fontWeight: "bold", color: "primary.main" }}
+                >
+                    Discover New Posts
+                </Typography>
+                <Typography
+                    variant="body1"
+                    align="center"
+                    sx={{ mb: 3, color: "text.secondary" }}
+                >
+                    Explore the latest posts and join the conversation!
+                </Typography>
+                <Box display="flex" justifyContent="center">
+                    <PostsList posts={posts} />
+                </Box>
+            </Paper>
+        </Container>
     );
 }

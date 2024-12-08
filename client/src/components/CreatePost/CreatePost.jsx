@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useDispatch } from "react-redux";
-import { createPost } from "../utils/api"; // Adjust the path to your utils
+import { createPost } from "../../utils/postsApi.js";
 import {
     Box,
     TextField,
@@ -11,7 +11,7 @@ import {
 
 const CreatePost = () => {
     const [content, setContent] = useState("");
-    const [photo, setPhoto] = useState(null); // For handling image uploads
+    const [photo, setPhoto] = useState(""); // Updated to handle a string (URL)
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState("");
     const [success, setSuccess] = useState(false);
@@ -24,34 +24,34 @@ const CreatePost = () => {
         setError("");
         setSuccess(false);
 
-        // Prepare the data
-        const formData = new FormData();
-        formData.append("content", content);
-        if (photo) formData.append("photo", photo);
+        const payload = { content };
+        if (photo) payload.photo = photo; // Include the photo URL
 
         try {
-            const result = await createPost(formData);
+            console.log("Sending API request with JSON payload:", payload);
+            const result = await createPost(payload);
+            console.log("API response received:", result);
+
             if (result.success !== false) {
                 setSuccess(true);
                 setContent("");
-                setPhoto(null);
-
-                // Dispatch Redux action or handle success state
+                setPhoto("");
                 dispatch({ type: "ADD_POST", payload: result });
             } else {
+                console.error("API returned an error:", result.error);
                 throw new Error(result.error);
             }
         } catch (err) {
+            console.error(
+                "An error occurred during post creation:",
+                err.message || err
+            );
             setError(
                 err.message || "An error occurred while creating the post."
             );
         } finally {
             setLoading(false);
         }
-    };
-
-    const handlePhotoChange = (e) => {
-        setPhoto(e.target.files[0]);
     };
 
     return (
@@ -80,29 +80,29 @@ const CreatePost = () => {
                 </Typography>
             )}
 
+            {/* Content Input */}
             <TextField
                 label="Content"
                 multiline
                 rows={4}
                 value={content}
-                onChange={(e) => setContent(e.target.value)}
+                onChange={(e) => {
+                    console.log("Content updated:", e.target.value);
+                    setContent(e.target.value);
+                }}
                 required
             />
 
-            <Button
-                variant="outlined"
-                component="label"
-                sx={{ justifyContent: "flex-start" }}
-            >
-                Upload Photo
-                <input
-                    type="file"
-                    accept="image/*"
-                    hidden
-                    onChange={handlePhotoChange}
-                />
-            </Button>
-            {photo && <Typography>{photo.name}</Typography>}
+            {/* Photo URL Input */}
+            <TextField
+                label="Photo URL"
+                value={photo}
+                onChange={(e) => {
+                    console.log("Photo URL updated:", e.target.value);
+                    setPhoto(e.target.value);
+                }}
+                placeholder="Enter an image URL"
+            />
 
             <Button type="submit" variant="contained" disabled={loading}>
                 {loading ? <CircularProgress size={24} /> : "Post"}
