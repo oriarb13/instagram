@@ -47,7 +47,7 @@ export default function LikeButton({
         >
             <FavoriteIcon
                 sx={{
-                    color: likedBy.includes(currentUserId) ? "red" : "grey",
+                    color: likedBy.includes(currentUserId) ? "red" : "gray",
                 }}
             />
         </IconButton>

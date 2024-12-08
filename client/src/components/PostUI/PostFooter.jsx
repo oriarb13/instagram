@@ -30,27 +30,28 @@ const ExpandMore = styled(IconButton, {
 
 export default function PostFooter({ post, comments = [] }) {
     const [likedBy, setLikedBy] = React.useState(post.likedBy || []);
+    const [expanded, setExpanded] = React.useState(false);
+    const [localComments, setLocalComments] = React.useState(comments);
 
     const handleLikesUpdate = (updatedLikes) => {
         setLikedBy(updatedLikes);
     };
-    const [expanded, setExpanded] = React.useState(false);
 
     const handleExpandClick = () => {
         setExpanded(!expanded);
     };
+
     return (
         <Box>
             <CardActions disableSpacing>
                 <LikeButton
                     postId={post._id}
                     initialLikedBy={likedBy}
-                    currentUserId={post.currentUserId}
-                    onUpdate={handleLikesUpdate} // Optional callback for parent
+                    onUpdate={handleLikesUpdate}
                 />
                 {post.likedBy?.length || 0}
                 <CommentIcon sx={{ marginLeft: "3px" }} />
-                {post.comments?.length || 0}
+                {localComments.length || 0}
                 <ExpandMore
                     expand={expanded}
                     onClick={handleExpandClick}
@@ -61,9 +62,14 @@ export default function PostFooter({ post, comments = [] }) {
                 </ExpandMore>
             </CardActions>
             <Collapse in={expanded} timeout="auto" unmountOnExit>
-                <AddComment postId={post._id} />
-                {comments && comments.length > 0 ? (
-                    comments.map((comment) => (
+                <AddComment
+                    postId={post._id}
+                    onCommentAdded={(newComment) =>
+                        setLocalComments((prev) => [...prev, newComment])
+                    }
+                />
+                {localComments && localComments.length > 0 ? (
+                    localComments.map((comment) => (
                         <CardContent key={comment._id}>
                             <CommentHeader
                                 username={comment.userId?.username}
