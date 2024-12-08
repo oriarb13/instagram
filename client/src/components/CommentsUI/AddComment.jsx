@@ -12,30 +12,32 @@ import CircularProgress from "@mui/material/CircularProgress";
 
 import { createComment } from "../../utils/commentsApi";
 
-export default function AddComment({ postId }) {
+export default function AddComment({ postId, onCommentAdded }) {
+    // Add onCommentAdded as a prop
     const [input, setInput] = React.useState("");
     const [loading, setLoading] = React.useState(false);
+
     const handleCreateComment = async () => {
         if (!input.trim()) return;
         setLoading(true);
 
         try {
-            // Prepare the data to be sent to the API
             const response = await createComment({ comContent: input, postId });
-            console.log("API Response:", response); // Log the full response
+            console.log("API Response:", response);
 
-            // Check the response for success
             if (response.success) {
-                console.log("Comment created successfully:", response.comment); // Log the created comment
-
-                setInput(""); // Clear the input field after a successful submission
+                console.log("Comment created successfully:", response.comment);
+                setInput(""); // Clear input
+                if (onCommentAdded) {
+                    onCommentAdded(response.comment); // Notify parent about the new comment
+                }
             } else {
-                console.error("Error creating comment:", response.error); // Log any errors from the API
+                console.error("Error creating comment:", response.error);
             }
         } catch (error) {
-            console.error("Unexpected error:", error); // Handle unexpected errors
+            console.error("Unexpected error:", error);
         } finally {
-            setLoading(false); // Always reset loading state to false
+            setLoading(false);
         }
     };
 
@@ -44,9 +46,7 @@ export default function AddComment({ postId }) {
             component="form"
             noValidate
             autoComplete="off"
-            onSubmit={(e) => {
-                e.preventDefault();
-            }}
+            onSubmit={(e) => e.preventDefault()}
         >
             <FormControl sx={{ m: 1, width: "25ch" }} variant="standard">
                 <InputLabel htmlFor="add-comment-input">
@@ -57,13 +57,13 @@ export default function AddComment({ postId }) {
                     value={input}
                     onChange={(e) => setInput(e.target.value)}
                     endAdornment={
-                        input.trim() && ( // Conditionally render button
+                        input.trim() && (
                             <InputAdornment position="end">
                                 <Button
                                     variant="text"
                                     onClick={handleCreateComment}
                                     disabled={loading}
-                                    style={{ color: "Blue" }}
+                                    style={{ color: "blue" }}
                                 >
                                     {loading ? (
                                         <CircularProgress size={16} />
