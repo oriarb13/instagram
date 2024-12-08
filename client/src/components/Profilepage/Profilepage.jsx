@@ -1,11 +1,15 @@
 import React, { useEffect, useState } from 'react';
-import { Grid, Card, Avatar, Typography, Button, Box, Paper } from '@mui/material';
+import { Button, Grid, Card, Avatar, Typography, Box, Paper } from '@mui/material';
 import { styled } from '@mui/system';
 import { useSelector } from 'react-redux';
 import { useCheckIfUserValid } from '../../hooks/use-check-if-user-valid';
 import { getUserByUsername } from '../../utils/userApi.js';
 import { getPostsByUsername } from '../../utils/postsApi.js';
-import { sendFriendRequest, removeFriend } from '../../utils/userApi.js';
+import FriendListModal from './friendlist.jsx';
+import Modal from '@mui/material/Modal';
+import PostCard from '../PostUI/Post.jsx';
+import { stringAvatar } from '../../utils/avatarStyler.js';
+import EditProfile from './EditProfile.jsx';
 
 const ProfileAvatar = styled(Avatar)({
   width: '120px',
@@ -14,7 +18,6 @@ const ProfileAvatar = styled(Avatar)({
   border: '4px solid pink',
 });
 
-const userName = "user1"; //להחליף לפרופס 
 const ProfilePage = () => {
   useCheckIfUserValid();
 
@@ -22,25 +25,19 @@ const ProfilePage = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [posts, setPosts] = useState([]);
-  const [reduxUser, setReduxUser] = useState({});
-  const [isFriends, setIsFriends] = useState(false);
+  const [openFriendsModal, setOpenFriendsModal] = useState(false);
+  const [openEditModal, setOpenEditModal] = useState(false);
 
   const onlineUserFromRedux = useSelector(state => state.user); //redux
 
   useEffect(() => {
-    const fetchClickedUser = async () => { //onpage user
+    const fetchClickedUser = async () => {
       try {
         setLoading(true);
-        const data = await getUserByUsername(userName);
-        const data2 = await getUserByUsername(onlineUserFromRedux.username);
-        console.log(data);
-        console.log(data2);
-
-        if (data && data2) {
-          setClickedUser(data);
-          setReduxUser(data2);
+        const data = await getUserByUsername(onlineUserFromRedux.username);
+        if (data) {
           console.log(data);
-          console.log(data2);
+          setClickedUser(data);
         } else {
           setError(data.error || 'Unable to load user data');
         }
@@ -51,27 +48,17 @@ const ProfilePage = () => {
       }
     };
 
-    if (userName) {
+    if (onlineUserFromRedux.username) {
       fetchClickedUser();
     }
-  }, [userName, onlineUserFromRedux.username]); 
+  }, [onlineUserFromRedux]);
 
-  //check if they are friends
-  useEffect(() => {
-    if (reduxUser && reduxUser.friends && clickedUser) {
-      const isFriend = reduxUser.friends.some(friend => friend.username === clickedUser.username);
-      setIsFriends(isFriend);
-    }
-  }, [reduxUser, clickedUser]);
-
-
-  //posts list
   useEffect(() => {
     if (clickedUser) {
       const fetchPosts = async () => {
         try {
           const postsData = await getPostsByUsername(clickedUser.username);
-          setPosts(postsData);
+          setPosts(postsData || []); // אם הפוסטים לא קיימים או ריקים, הגדר מערך ריק
         } catch (err) {
           setError(err.message || 'Error fetching posts');
         }
@@ -80,43 +67,20 @@ const ProfilePage = () => {
     }
   }, [clickedUser]);
 
-  //add/remove
-  const handleOnClick = async () => {
-    try {
-      if (isFriends) {
-        //remove
-        await removeFriend(clickedUser._id);
-        setClickedUser(prevState => ({
-          ...prevState,
-          friends: prevState.friends.filter(friend => friend.username !== reduxUser.username),
-        }));
-        setReduxUser(prevState => ({
-          ...prevState,
-          friends: prevState.friends.filter(friend => friend.username !== clickedUser.username),
-        }));
-      } else {
-        //add friend
-        await sendFriendRequest(clickedUser._id);
-        setClickedUser(prevState => ({
-          ...prevState,
-          friends: [...prevState.friends, { username: reduxUser.username, _id: reduxUser._id }],
-        }));
-        setReduxUser(prevState => ({
-          ...prevState,
-          friends: [...prevState.friends, { username: clickedUser.username, _id: clickedUser._id }],
-        }));
-      }
-    } catch (err) {
-      setError(err.message || 'Error during friend request');
-    }
-  };
+  // modal friends
+  const handleOpenFriendsModal = () => setOpenFriendsModal(true);
+  const handleCloseFriendsModal = () => setOpenFriendsModal(false);
+
+  // modal edit
+  const handleOpenEditModal = () => setOpenEditModal(true);
+  const handleCloseEditModal = () => setOpenEditModal(false);
 
   if (loading) {
     return <div>Loading...</div>;
   }
 
   if (error) {
-    return <div>Error: {error}</div>;
+    return <div style={{ color: 'red' }}>Error: {error}</div>;
   }
 
   return (
@@ -133,46 +97,73 @@ const ProfilePage = () => {
               @{clickedUser.username}
             </Typography>
 
+            <Typography variant="body2" color="text.secondary" sx={{ marginTop: '10px' }}>
+              bio: {clickedUser.bio || 'hey'}
+            </Typography>
+
             <Box sx={{ marginTop: 2, display: 'flex', justifyContent: 'space-around' }}>
               <Box>
-                <Typography variant="h6">{posts.length}</Typography>
+                <Typography variant="h6">{posts && Array.isArray(posts) ? posts.length : 0}</Typography>
                 <Typography variant="body2" color="text.secondary">
                   Posts
                 </Typography>
               </Box>
 
               <Box>
-                <Typography variant="h6">{clickedUser.friends.length}</Typography>
-                <Typography variant="body2" color="text.secondary">
+                <Typography variant="h6">{clickedUser.friends && Array.isArray(clickedUser.friends) ? clickedUser.friends.length : 0}</Typography>
+                <Typography
+                  variant="body2"
+                  color="text.secondary"
+                  sx={{
+                    ":hover": { backgroundColor: 'pink', borderColor: 'pink', color: 'green', cursor: 'pointer' },
+                  }}
+                  onClick={handleOpenFriendsModal}
+                >
                   Friends
                 </Typography>
               </Box>
 
-              {onlineUserFromRedux.username === clickedUser.username ? (
-                <div></div> // user own profile
-              ) : (
-                <Button variant="outlined" sx={{ marginTop: 3 }} onClick={handleOnClick}>
-                  {isFriends ? 'Remove Friend' : 'Add Friend'}
-                </Button>
-              )}
+              <Button
+                onClick={handleOpenEditModal}
+                variant="outlined"
+                sx={{ marginTop: 3, ":hover": { backgroundColor: 'pink', borderColor: 'pink', color: 'green', cursor: 'pointer' } }}
+              >
+                edit profile
+              </Button>
             </Box>
           </Card>
         </Grid>
 
         <Grid item xs={12} md={8}>
           <Grid container spacing={2}>
-            {posts.map((post, index) => (
-              <Grid item xs={6} sm={4} md={3} key={index}>
-                <Paper sx={{ height: 200, backgroundColor: '#f0f0f0' }}>
-                  <Typography variant="body2" color="text.secondary" sx={{ padding: 2 }}>
-                    {post._id}
-                  </Typography>
-                </Paper>
-              </Grid>
-            ))}
+            {posts && Array.isArray(posts) && posts.length > 0 ? (
+              posts.map((post) => (
+                <Grid item xs={6} sm={4} md={3} key={post._id}>
+                  <Paper sx={{ height: 200, backgroundColor: '#f0f0f0' }}>
+                    <PostCard post={post} />
+                  </Paper>
+                </Grid>
+              ))
+            ) : (
+              <Typography variant="h6" color="text.secondary">
+                No posts available.
+              </Typography>
+            )}
           </Grid>
         </Grid>
       </Grid>
+
+      <Modal open={openFriendsModal} onClose={handleCloseFriendsModal}>
+        <Box sx={{ padding: 2, backgroundColor: 'black', margin: 'auto', marginTop: '50%', maxWidth: '200px' }}>
+          <FriendListModal friends={clickedUser.friends || []} />
+        </Box>
+      </Modal>
+
+      <Modal open={openEditModal} onClose={handleCloseEditModal}>
+        <Box sx={{ padding: 2, backgroundColor: 'white', margin: 'auto', marginTop: '20%', maxWidth: '200px' }}>
+          <EditProfile currentUser={clickedUser} />
+        </Box>
+      </Modal>
     </Box>
   );
 };

@@ -108,11 +108,12 @@ export const toggleLikePost = async (id) => {
             `${base_url}/api/posts/${id}/like`,
             {},
             {
-                withCredentials: true,
+                withCredentials: true, 
             }
         );
         return response.data;
     } catch (error) {
+        console.error("Error toggling like:", error);
         return {
             success: false,
             error: error.response?.data || error.message,

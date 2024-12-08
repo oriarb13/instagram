@@ -3,15 +3,14 @@ import { createSlice } from "@reduxjs/toolkit";
 const userSlice = createSlice({
     name: "user",
     initialState: {
-        username: "", // Initial username is empty
+        username: "",
     },
     reducers: {
         setUser: (state, action) => {
-            // Update username from action payload
-            state.username = action.payload.username || action.payload; // Handle both structured and direct payloads
+            state.username = action.payload.username || action.payload;
         },
         clearUser: (state) => {
-            state.username = ""; // Clear username on logout or reset
+            state.username = "";
         },
     },
 });

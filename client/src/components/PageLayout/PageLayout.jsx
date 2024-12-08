@@ -1,9 +1,12 @@
 import Box from "@mui/material/Box";
 
+
 import { useLocation } from "react-router-dom";
 import NavBar from "./Navbar";
 
+
 import { styled } from "@mui/material/styles";
+
 
 const Offset = styled("div")(({ theme }) => ({
     ...theme.mixins.toolbar, // Get height from theme
@@ -12,6 +15,7 @@ const Offset = styled("div")(({ theme }) => ({
 const PageLayout = ({ children }) => {
     const location = useLocation();
     const noNav = ["/login", "/signup", "/"];
+
 
     return (
         <Box
@@ -32,6 +36,7 @@ const PageLayout = ({ children }) => {
                 </>
             )}
 
+
             <Box
                 sx={{
                     flexGrow: 1, // Ensure it fills available space
@@ -50,4 +55,8 @@ const PageLayout = ({ children }) => {
     );
 };
 
+
 export default PageLayout;
+
+
+

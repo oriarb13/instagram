@@ -57,7 +57,7 @@ router.post("/logOut",verifyToken,logOut);
 
 
 
-// Update a user by username
+// Update a user
 router.patch("/updateUser",verifyToken, updateUser);
 
 
