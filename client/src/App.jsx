@@ -1,4 +1,4 @@
-import { BrowserRouter, Route, Routes, useLocation } from "react-router-dom";
+import { BrowserRouter, Route, Routes } from "react-router-dom";
 
 //import Pages
 import HomePage from "./pages/HomePage/HomePage.jsx";
@@ -16,22 +16,6 @@ import NotFound from "./pages/notfound/NotFound.jsx";
 function App() {
     return (
         <>
-<<<<<<<<< Temporary merge branch 1
-            {!noNav.includes(location.pathname) && <NavBar />}
-            <Routes>
-                <Route path="/signup" element={<SignUp />} />
-                <Route path="/" element={<SignUp/>} />
-                <Route path="/home" element={<HomePage />} />
-                <Route path="/login" element={<Login />} />
-                <Route path="/discover" element={<DiscoverPage />} />
-                <Route path="/search" element={<SearchPage />} />
-                <Route path="/create-post" element={<CreatePostPage />} />
-                <Route path="*" element={<NotFound />} />
-                <Route path="/profile" element={<ProfilePage />} />
-
-
-            </Routes>
-=========
             <PageLayout>
                 <Routes>
                     <Route path="/signup" element={<SignUp />} />
@@ -43,8 +27,6 @@ function App() {
                     <Route path="/create-post" element={<CreatePostPage />} />
                     <Route path="*" element={<NotFound />} />
                     <Route path="/profile" element={<ProfilePage />} />
-                {/* הוספתי */}
-                <Route path="/userPage/:username" element={<ProfileUserPage />} />
                 </Routes>
             </PageLayout>
         </>

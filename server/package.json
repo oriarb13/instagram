@@ -1,34 +1,4 @@
 {
-<<<<<<< HEAD
-<<<<<<< HEAD
-  "name": "server",
-  "version": "1.0.0",
-  "main": "app.js",
-  "type": "module",
-  "scripts": {
-    "start": "nodemon apps.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "dependencies": {
-    "bcrypt": "^5.1.1",
-    "cookie-parser": "^1.4.7",
-    "cors": "^2.8.5",
-    "dotenv": "^16.4.5",
-    "express": "^4.21.1",
-    "js-cookie": "^3.0.5",
-    "jsonwebtoken": "^9.0.2",
-    "mongodb": "^6.10.0",
-    "mongoose": "^8.8.0",
-    "morgan": "^1.10.0",
-    "react-cookie": "^7.2.2"
-  },
-  "description": ""
-=======
-=======
->>>>>>> b791943ad6b5d1f0d92337e8fcb7955f0f9685b5
     "name": "server",
     "version": "1.0.0",
     "main": "app.js",
@@ -54,8 +24,4 @@
         "react-cookie": "^7.2.2"
     },
     "description": ""
-<<<<<<< HEAD
->>>>>>> 4bb07bd8754834de7c119aa2ddfcca3e532b66da
-=======
->>>>>>> b791943ad6b5d1f0d92337e8fcb7955f0f9685b5
 }
