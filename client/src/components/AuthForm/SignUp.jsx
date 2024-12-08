@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useDispatch } from "react-redux"; //redux
 import { setUser } from "../../store/slices/userSlice.js";  //redux
 import { signUp } from "../../utils/userApi"; 
+import { useNavigate } from "react-router-dom"; 
 
 import {
   Avatar,
@@ -25,6 +26,7 @@ import { Link } from "react-router-dom";
 
 const SignUp = () => {
   const dispatch = useDispatch(); //redux
+  const navigate = useNavigate();  // Initialize navigation
 
   // State for form inputs
   const [usernameInput, setUsernameInput] = useState("");
@@ -97,6 +99,10 @@ const SignUp = () => {
     } catch (error) {
       console.log("Error occurred during sign-up:", error);
     }
+    setTimeout(() => {//
+      navigate("/login");
+    }, 1500);
+
   };
 
   return (

@@ -4,16 +4,19 @@ const base_url = 'http://localhost:3000';  // בחר את ה-API שלך
 
 //comments of specific post
 export const getCommentsByPostId = async (postId) => {
-    try {
+  try {
       const response = await axios.get(`${base_url}/api/comments/post/${postId}`);
-      return response.data;
-    } catch (error) {
       return {
-        success: false,
-        error: error.response?.data || error.message,
+          success: true,
+          comments: response.data, 
       };
-    }
-  };
+  } catch (error) {
+      return {
+          success: false,
+          error: error.response?.data || error.message,
+      };
+  }
+};
   
 
   //delete comment
@@ -32,17 +35,13 @@ export const deleteComment = async (id) => {
   };
   
   //create comment
-export const createComment = async (commentData) => {
+  export const createComment = async (commentData) => {
     try {
-      const response = await axios.post(`${base_url}/api/comments`, commentData, {
-        withCredentials: true, 
-      });
-      return response.data; 
+        const response = await axios.post(`${base_url}/api/comments`, commentData, { withCredentials: true });
+        return response.data; 
     } catch (error) {
-      return {
-        success: false,
-        error: error.response?.data || error.message,
-      };
+        return { success: false, error: error.response?.data || error.message };
     }
-  };
+};
+
   
