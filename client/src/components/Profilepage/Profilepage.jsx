@@ -18,7 +18,6 @@ const ProfileAvatar = styled(Avatar)({
   border: '4px solid pink',
 });
 
-const userName = "user1"; //להחליף לפרופס 
 const ProfilePage = () => {
   useCheckIfUserValid();
 
@@ -32,16 +31,13 @@ const ProfilePage = () => {
   const onlineUserFromRedux = useSelector(state => state.user); //redux
 
   useEffect(() => {
-    const fetchClickedUser = async () => { //onpage user
+    const fetchClickedUser = async () => {
       try {
         setLoading(true);
         const data = await getUserByUsername(onlineUserFromRedux.username);
         if (data) {
           console.log(data);
           setClickedUser(data);
-          setReduxUser(data2);
-          console.log(data);
-          console.log(data2);
         } else {
           setError(data.error || 'Unable to load user data');
         }
@@ -52,27 +48,17 @@ const ProfilePage = () => {
       }
     };
 
-    if (userName) {
+    if (onlineUserFromRedux.username) {
       fetchClickedUser();
     }
-  }, [userName, onlineUserFromRedux.username]); 
+  }, [onlineUserFromRedux]);
 
-  //check if they are friends
-  useEffect(() => {
-    if (reduxUser && reduxUser.friends && clickedUser) {
-      const isFriend = reduxUser.friends.some(friend => friend.username === clickedUser.username);
-      setIsFriends(isFriend);
-    }
-  }, [reduxUser, clickedUser]);
-
-
-  //posts list
   useEffect(() => {
     if (clickedUser) {
       const fetchPosts = async () => {
         try {
           const postsData = await getPostsByUsername(clickedUser.username);
-          setPosts(postsData || []); 
+          setPosts(postsData || []); // אם הפוסטים לא קיימים או ריקים, הגדר מערך ריק
         } catch (err) {
           setError(err.message || 'Error fetching posts');
         }
@@ -147,7 +133,6 @@ const ProfilePage = () => {
             </Box>
           </Card>
         </Grid>
-
 
         <Grid item xs={12} md={8}>
           <Grid container spacing={2}>
