@@ -17,7 +17,7 @@ export default function CommentHeader({ username, createdAt }) {
                         ...stringAvatar(username).sx,
                     }}
                     component={Link}
-                    to={`/user/${username}`}
+                    to={`/userPage/${username}`}
                 />
             }
             title={username || "Username not found"}

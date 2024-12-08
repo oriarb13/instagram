@@ -97,42 +97,44 @@ const ProfileUserPage = () => {
         try {
             if (isFriends) {
                 await removeFriend(clickedUser._id);
+    
                 setClickedUser((prevState) => ({
                     ...prevState,
-                    friends: prevState.friends.filter(
+                    friends: Array.isArray(prevState.friends) ? prevState.friends.filter(
                         (friend) => friend.username !== reduxUser.username
-                    ),
+                    ) : [],
                 }));
+    
                 setReduxUser((prevState) => ({
                     ...prevState,
-                    friends: prevState.friends.filter(
+                    friends: Array.isArray(prevState.friends) ? prevState.friends.filter(
                         (friend) => friend.username !== clickedUser.username
-                    ),
+                    ) : [],
                 }));
             } else {
                 await sendFriendRequest(clickedUser._id);
+    
                 setClickedUser((prevState) => ({
                     ...prevState,
-                    friends: [
+                    friends: Array.isArray(prevState.friends) ? [
                         ...prevState.friends,
                         { username: reduxUser.username, _id: reduxUser._id },
-                    ],
+                    ] : [{ username: reduxUser.username, _id: reduxUser._id }],
                 }));
+    
                 setReduxUser((prevState) => ({
                     ...prevState,
-                    friends: [
+                    friends: Array.isArray(prevState.friends) ? [
                         ...prevState.friends,
-                        {
-                            username: clickedUser.username,
-                            _id: clickedUser._id,
-                        },
-                    ],
+                        { username: clickedUser.username, _id: clickedUser._id },
+                    ] : [{ username: clickedUser.username, _id: clickedUser._id }],
                 }));
             }
         } catch (err) {
             setError(err.message || "Error during friend request");
         }
     };
+    
 
     const handleOpenFriendsModal = () => {
         setOpenFriendsModal(true);

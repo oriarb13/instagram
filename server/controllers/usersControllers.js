@@ -274,31 +274,34 @@ export const removeFriend = async (req, res) => {
     }
 };
 
-// Update an existing user by username
+// Update an existing user
 export const updateUser = async (req, res) => {
     try {
-        const { newUsername, newEmail, newImg, newBio } = req.body; 
-        const id = req.user._id;
-        const updateData = {};
-
-        if (newUsername) updateData.username = newUsername;
-        if (newEmail) updateData.email = newEmail;
-        if (newImg) updateData.img = newImg;   
-        if (newBio) updateData.bio = newBio;   
-
-        const updatedUser = await User.findByIdAndUpdate(id, updateData, {
-            new: true,
-        });
-
-        res.status(201).send({
-            message: "User updated successfully",
-            updatedUser,
-        });
+      console.log(req.body); // זה יראה את כל מה שנשלח מהלקוח
+      const { newUsername, newEmail, newImg, newBio } = req.body; // אם יש תמונה
+      const id = req.user._id;
+      const updateData = {};
+  
+      if (newUsername) updateData.username = newUsername;
+      if (newEmail) updateData.email = newEmail;
+      if (newImg) updateData.img = newImg; // אם יש תמונה חדשה
+      if (newBio) updateData.bio = newBio;
+  
+      // עדכון המשתמש במסד נתונים
+      const updatedUser = await User.findByIdAndUpdate(id, updateData, { new: true });
+      
+      // בדוק אם המידע עודכן
+      console.log(updatedUser);
+      res.status(201).send({
+        message: "User updated successfully",
+        updatedUser,
+      });
     } catch (error) {
-        console.error("Error updating user", error);
-        res.status(500).json({ error: "Server error" });
+      console.error("Error updating user", error);
+      res.status(500).json({ error: "Server error" });
     }
-};
+  };
+  
 
 // Delete a user by username
 export const deleteUser = async (req, res) => {

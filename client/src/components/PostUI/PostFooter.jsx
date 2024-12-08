@@ -1,37 +1,36 @@
-import React from "react";
-
-import { styled } from "@mui/material/styles";
-import { Card, Box } from "@mui/material/";
-import CardHeader from "@mui/material/CardHeader";
-import CardMedia from "@mui/material/CardMedia";
-import CardContent from "@mui/material/CardContent";
-import CardActions from "@mui/material/CardActions";
-import Collapse from "@mui/material/Collapse";
-
-import IconButton from "@mui/material/IconButton";
-import Typography from "@mui/material/Typography";
-import FavoriteIcon from "@mui/icons-material/Favorite";
-import CommentIcon from "@mui/icons-material/Comment";
-import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
-
+import React, { useState, useEffect } from "react";
+import { Box, CardActions, Collapse, CardContent, Typography } from "@mui/material/";
+import { getCommentsByPostId } from "../../utils/commentsApi";
 import CommentHeader from "../CommentsUI/CommentHeader.jsx";
 import AddComment from "../CommentsUI/AddComment.jsx";
 import LikeButton from "./LikeButton.jsx";
-
-const ExpandMore = styled(IconButton, {
-    shouldForwardProp: (prop) => prop !== "expand",
-})(({ theme, expand }) => ({
-    transform: expand ? "rotate(180deg)" : "rotate(0deg)",
-    marginLeft: "auto",
-    transition: theme.transitions.create("transform", {
-        duration: theme.transitions.duration.shortest,
-    }),
-}));
+import CommentIcon from "@mui/icons-material/Comment";
+import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
+import ExpandMore from "@mui/material/IconButton";
+import FavoriteIcon from "@mui/icons-material/Favorite";
 
 export default function PostFooter({ post, comments = [] }) {
-    const [likedBy, setLikedBy] = React.useState(post.likedBy || []);
-    const [expanded, setExpanded] = React.useState(false);
-    const [localComments, setLocalComments] = React.useState(comments);
+    const [likedBy, setLikedBy] = useState(post.likedBy || []);
+    const [expanded, setExpanded] = useState(false);
+    const [localComments, setLocalComments] = useState(comments);
+
+    useEffect(() => {
+        const fetchComments = async () => {
+            const data = await getCommentsByPostId(post._id);
+            
+            if (data.success) {
+                setLocalComments(data.comments);
+            } else {
+                console.error("Failed to load comments:", data?.error);
+            }
+        };
+
+        if (comments.length === 0) {
+            fetchComments();
+        } else {
+            setLocalComments(comments);
+        }
+    }, [post._id]);
 
     const handleLikesUpdate = (updatedLikes) => {
         setLikedBy(updatedLikes);
@@ -47,9 +46,10 @@ export default function PostFooter({ post, comments = [] }) {
                 <LikeButton
                     postId={post._id}
                     initialLikedBy={likedBy}
+                    currentUserId={post.currentUserId}
                     onUpdate={handleLikesUpdate}
                 />
-                {post.likedBy?.length || 0}
+                {likedBy.length || 0}
                 <CommentIcon sx={{ marginLeft: "3px" }} />
                 {localComments.length || 0}
                 <ExpandMore

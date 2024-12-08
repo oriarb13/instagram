@@ -267,20 +267,18 @@ export const toggleLikePost = async (req, res) => {
             return res.status(404).json({ error: "Post not found." });
         }
 
-        // if already like so unlike
         if (post.likedBy.includes(userId)) {
             post.likedBy = post.likedBy.filter(
                 (user) => user.toString() !== userId.toString()
             );
         } else {
-            // if didnt like yet so like
             post.likedBy.push(userId);
         }
 
         await post.save();
         res.status(200).json({
             message: "Post like toggled successfully.",
-            post,
+            post, 
         });
     } catch (error) {
         console.error("Error toggling like:", error);
