@@ -124,6 +124,16 @@ export const logOut = (req, res) => {
 
 // Get all users
 export const getAllUsers = async (req, res) => {
+<<<<<<< HEAD
+<<<<<<< HEAD
+  try {
+    const users = await User.find()
+    .populate("friends", "username ")
+    if (users.length === 0) {
+      return res.status(404).json({ message: "No users found." });    
+=======
+=======
+>>>>>>> b791943ad6b5d1f0d92337e8fcb7955f0f9685b5
     try {
         const users = await User.find().populate("friends", "username img ");
         if (users.length === 0) {
@@ -133,15 +143,41 @@ export const getAllUsers = async (req, res) => {
     } catch (error) {
         console.error("Error fetching users:", error);
         res.status(500).json({ error: "Unknown server error." });
+<<<<<<< HEAD
+>>>>>>> 4bb07bd8754834de7c119aa2ddfcca3e532b66da
+=======
+>>>>>>> b791943ad6b5d1f0d92337e8fcb7955f0f9685b5
     }
 };
 
 // Get a specific user by username
 export const getUserByUsername = async (req, res) => {
+<<<<<<< HEAD
+<<<<<<< HEAD
+  try {
+    const user = await User.findOne({ username: req.params.username })
+    .populate("friends", "username ")
+
+    if (!user) {
+      return res.status(404).json({ error: "User not found." });    
+    }
+    res.status(200).json(user);
+  } catch (error) {
+    console.error("Error finding user by username:", error);
+    res.status(500).json({ error: "Server error." });  
+  }
+};
+=======
+=======
+>>>>>>> b791943ad6b5d1f0d92337e8fcb7955f0f9685b5
     try {
         const user = await User.findOne({
             username: req.params.username,
         }).populate("friends", "username ");
+<<<<<<< HEAD
+>>>>>>> 4bb07bd8754834de7c119aa2ddfcca3e532b66da
+=======
+>>>>>>> b791943ad6b5d1f0d92337e8fcb7955f0f9685b5
 
         if (!user) {
             return res.status(404).json({ error: "User not found." });

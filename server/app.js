@@ -2,7 +2,15 @@ import express from "express";
 import cors from "cors";
 import morgan from "morgan";
 import mongoose from "mongoose";
+<<<<<<< HEAD
+<<<<<<< HEAD
+import cookieParser from 'cookie-parser';
+=======
 import cookieParser from "cookie-parser";
+>>>>>>> 4bb07bd8754834de7c119aa2ddfcca3e532b66da
+=======
+import cookieParser from "cookie-parser";
+>>>>>>> b791943ad6b5d1f0d92337e8fcb7955f0f9685b5
 //env
 import dotenv from "dotenv";
 //routes

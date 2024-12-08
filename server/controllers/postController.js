@@ -4,6 +4,17 @@ import User from "../models/userModels.js";
 
 // Get all posts
 export const getAllPosts = async (req, res) => {
+<<<<<<< HEAD
+<<<<<<< HEAD
+  try {
+    const posts = await Post.find()
+    .populate("likedBy", "username email")
+    .populate("posterId","username")
+    if (posts.length === 0) { 
+      return res.status(404).json({ message: "No posts found." });     
+=======
+=======
+>>>>>>> b791943ad6b5d1f0d92337e8fcb7955f0f9685b5
     try {
         const posts = await Post.find()
             .populate("likedBy", "username email img")
@@ -15,15 +26,32 @@ export const getAllPosts = async (req, res) => {
     } catch (error) {
         console.error("Error fetching posts:", error);
         res.status(500).json({ error: "Unknown server error." });
+<<<<<<< HEAD
+>>>>>>> 4bb07bd8754834de7c119aa2ddfcca3e532b66da
+=======
+>>>>>>> b791943ad6b5d1f0d92337e8fcb7955f0f9685b5
     }
 };
 
 // Get post by ID
 export const getPostById = async (req, res) => {
+<<<<<<< HEAD
+<<<<<<< HEAD
+  try {
+    const post = await Post.findById(req.params.id)
+      .populate("likedBy", "username email")
+      .populate("posterId","username")
+=======
+=======
+>>>>>>> b791943ad6b5d1f0d92337e8fcb7955f0f9685b5
     try {
         const post = await Post.findById(req.params.id)
-            .populate("likedBy", "username email img")
-            .populate("posterId", "username img");
+            .populate("likedBy", "username email")
+            .populate("posterId", "username");
+<<<<<<< HEAD
+>>>>>>> 4bb07bd8754834de7c119aa2ddfcca3e532b66da
+=======
+>>>>>>> b791943ad6b5d1f0d92337e8fcb7955f0f9685b5
 
         if (!post) {
             return res.status(404).json({ error: "Post not found." });
@@ -93,8 +121,18 @@ export const deletePost = async (req, res) => {
 
 // posts by username
 export const getPostsByUsername = async (req, res) => {
+<<<<<<< HEAD
+<<<<<<< HEAD
+  try {
+    const user = await User.findOne({ username: req.params.username })
+=======
     try {
         const user = await User.findOne({ username: req.params.username });
+>>>>>>> 4bb07bd8754834de7c119aa2ddfcca3e532b66da
+=======
+    try {
+        const user = await User.findOne({ username: req.params.username });
+>>>>>>> b791943ad6b5d1f0d92337e8fcb7955f0f9685b5
 
         if (!user) {
             return res.status(404).json({ message: "User not found." });
@@ -115,6 +153,26 @@ export const getPostsByUsername = async (req, res) => {
         console.error("Error fetching posts by username:", error);
         res.status(500).json({ error: "Server error." });
     }
+<<<<<<< HEAD
+<<<<<<< HEAD
+
+    const posts = await Post.find({ posterId: user._id })
+    .populate("likedBy", "username email")
+    .populate("posterId","username")
+
+    if (posts.length === 0) {
+      return res.status(404).json({ message: "No posts found for this user." });
+    }
+
+    res.status(200).json(posts);
+  } catch (error) {
+    console.error("Error fetching posts by username:", error);
+    res.status(500).json({ error: "Server error." });
+  }
+=======
+>>>>>>> 4bb07bd8754834de7c119aa2ddfcca3e532b66da
+=======
+>>>>>>> b791943ad6b5d1f0d92337e8fcb7955f0f9685b5
 };
 
 // users who liked
@@ -139,6 +197,33 @@ export const getUsersWhoLikedPost = async (req, res) => {
 
 // posts of friends
 export const getPostsFromFriends = async (req, res) => {
+<<<<<<< HEAD
+<<<<<<< HEAD
+  try {
+    const user = await User.findOne({ username: req.params.username }).populate("friends");//get the user 
+    
+    if (!user) {
+      return res.status(404).json({ error: "User not found." });
+    }
+
+    const friendsIds = user.friends.map(friend => friend._id);//get his friends ids
+
+    const posts = await Post.find({ posterId: { $in: friendsIds } })//if some poster id equal to some id of his friends
+      .populate("likedBy", "username email") //return 
+      .populate("posterId","username")
+
+    if (posts.length === 0) {
+      return res.status(404).json({ message: "No posts found from friends." });
+    }
+
+    res.status(200).json(posts);
+  } catch (error) {
+    console.error("Error fetching posts from friends:", error);
+    res.status(500).json({ error: "Server error." });
+  }
+=======
+=======
+>>>>>>> b791943ad6b5d1f0d92337e8fcb7955f0f9685b5
     try {
         const user = await User.findOne({
             username: req.params.username,
@@ -165,6 +250,10 @@ export const getPostsFromFriends = async (req, res) => {
         console.error("Error fetching posts from friends:", error);
         res.status(500).json({ error: "Server error." });
     }
+<<<<<<< HEAD
+>>>>>>> 4bb07bd8754834de7c119aa2ddfcca3e532b66da
+=======
+>>>>>>> b791943ad6b5d1f0d92337e8fcb7955f0f9685b5
 };
 
 export const toggleLikePost = async (req, res) => {
