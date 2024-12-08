@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Grid, Card, Avatar, Typography, Button, Box, Paper } from '@mui/material';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link, useNavigate } from 'react-router-dom';
 import { getUserByUsername } from '../../utils/userApi.js';
 import { getPostsByUsername } from '../../utils/postsApi.js';
 import { sendFriendRequest, removeFriend } from '../../utils/userApi.js';
@@ -8,6 +8,7 @@ import { useSelector } from 'react-redux';
 import FriendListModal from './friendlist.jsx';
 import Modal from '@mui/material/Modal';
 import { styled } from '@mui/system';
+import PostCard from '../PostUI/Post.jsx';
 
 const ProfileAvatar = styled(Avatar)({
   width: '120px',
@@ -17,6 +18,7 @@ const ProfileAvatar = styled(Avatar)({
 });
 
 const ProfileUserPage = () => {
+  const navigate = useNavigate();
   const { username } = useParams();
   const [clickedUser, setClickedUser] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -27,6 +29,10 @@ const ProfileUserPage = () => {
   const [openFriendsModal, setOpenFriendsModal] = useState(false);
   
   const onlineUserFromRedux = useSelector(state => state.user);
+
+  if (username===onlineUserFromRedux.username) {
+    navigate("/profile");
+  }
 
   useEffect(() => {
     const fetchClickedUser = async () => {
@@ -58,6 +64,7 @@ const ProfileUserPage = () => {
       setIsFriends(isFriend);
     }
   }, [reduxUser, clickedUser]);
+
 
   useEffect(() => {
     if (clickedUser) {
@@ -159,13 +166,11 @@ const ProfileUserPage = () => {
 
         <Grid item xs={12} md={8}>
           <Grid container spacing={2}>
-            {posts.map((post, index) => (
-              <Grid item xs={6} sm={4} md={3} key={index}>
+            {posts.map((post) => (
+              <Grid item xs={6} sm={4} md={3} key={post._id}>
                 <Paper sx={{ height: 200, backgroundColor: '#f0f0f0' }}>
-                  <Typography variant="body2" color="text.secondary" sx={{ padding: 2 }}>
-                    {post._id}
-                  </Typography>
-                </Paper>
+                <PostCard post={post}></PostCard> 
+              </Paper>
               </Grid>
             ))}
           </Grid>

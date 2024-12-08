@@ -19,7 +19,7 @@ export default function PostHeader({ post }) {
                         ...stringAvatar(post.posterId?.username).sx,
                     }}
                     component={Link}
-                    to={`/user/${post.posterId?.username}`}
+                    to={`/userPage/${post.posterId?.username}`}
                 />
             }
             title={post.posterId?.username || "Title not found"}

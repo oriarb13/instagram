@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Grid, Card, Avatar, Typography, Box, Paper } from '@mui/material';
+import {Button, Grid, Card, Avatar, Typography, Box, Paper } from '@mui/material';
 import { styled } from '@mui/system';
 import { useSelector } from 'react-redux';
 import { useCheckIfUserValid } from '../../hooks/use-check-if-user-valid';
@@ -7,6 +7,7 @@ import { getUserByUsername } from '../../utils/userApi.js';
 import { getPostsByUsername } from '../../utils/postsApi.js';
 import FriendListModal from './friendlist.jsx';
 import Modal from '@mui/material/Modal';
+import PostCard from '../PostUI/Post.jsx';
 
 const ProfileAvatar = styled(Avatar)({
   width: '120px',
@@ -103,26 +104,19 @@ const ProfilePage = () => {
                 </Typography>
               </Box>
 
-              {onlineUserFromRedux.username === clickedUser.username ? (
-                <div></div>
-              ) : (
-                <Button variant="outlined" sx={{ marginTop: 3, ":hover": { backgroundColor: "pink", borderColor: "pink", color: "green" } }} onClick={handleOnClick}>
-                  {isFriends ? 'Remove Friend' : 'Add Friend'}
+                <Button variant="outlined" sx={{ marginTop: 3, ":hover": { backgroundColor: "pink", borderColor: "pink", color: "green" } }} >
+                  edit profile
                 </Button>
-              )}
             </Box>
           </Card>
         </Grid>
-
         <Grid item xs={12} md={8}>
           <Grid container spacing={2}>
-            {posts.map((post, index) => (
-              <Grid item xs={6} sm={4} md={3} key={index}>
+            {posts.map((post) => (
+              <Grid item xs={6} sm={4} md={3} key={post._id}>
                 <Paper sx={{ height: 200, backgroundColor: '#f0f0f0' }}>
-                  <Typography variant="body2" color="text.secondary" sx={{ padding: 2 }}>
-                    {post._id}
-                  </Typography>
-                </Paper>
+                <PostCard post={post}></PostCard> 
+              </Paper>
               </Grid>
             ))}
           </Grid>
