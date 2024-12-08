@@ -10,6 +10,9 @@ import commentsRoutes from "./routes/commentsRoute.js";
 import postsRoutes from "./routes/postsRoute.js";
 import usersRoutes from "./routes/usersRoute.js";
 
+
+
+
 const app = express();
 const PORT = 3000;
 dotenv.config();
