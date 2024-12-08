@@ -2,6 +2,7 @@ import React from "react";
 import { Stack, Typography, Box } from "@mui/material";
 import PostCard from "./Post.jsx";
 
+
 export default function PostsList({ posts = [] }) {
     if (posts.length === 0) {
         return (
@@ -11,8 +12,18 @@ export default function PostsList({ posts = [] }) {
         );
     }
 
+
     return (
-        <Box sx={{ width: "80%" }}>
+        <Box
+            sx={{
+                width: "80%",
+
+
+                display: "flex",
+                justifyContent: "center",
+                marginBlock: 2,
+            }}
+        >
             <Stack spacing={2}>
                 {posts.map((post) => (
                     <PostCard
@@ -25,3 +36,6 @@ export default function PostsList({ posts = [] }) {
         </Box>
     );
 }
+
+
+
