@@ -22,7 +22,7 @@ export const TokenValid = (req, res) => {
 //create user
 export const createNewUser = async (req, res) => {
     try {
-        const { username, email, password } = req.body;
+        const { username, email, password, img, bio } = req.body; 
         if (!username || !password || !email) {
             return res
                 .status(400)
@@ -42,19 +42,20 @@ export const createNewUser = async (req, res) => {
             username,
             email,
             password: hashedPassword,
+            img,  
+            bio,  
         });
 
         await newUser.save();
         res.status(201).send({
             status: "success",
-            message: "User register successfully",
+            message: "User registered successfully",
             data: newUser,
         });
     } catch (error) {
         res.status(500).send(error);
     }
 };
-
 //sign in
 export const singInUser = async (req, res) => {
     const { username, email, password } = req.body;
@@ -124,7 +125,7 @@ export const logOut = (req, res) => {
 // Get all users
 export const getAllUsers = async (req, res) => {
     try {
-        const users = await User.find().populate("friends", "username ");
+        const users = await User.find().populate("friends", "username img ");
         if (users.length === 0) {
             return res.status(404).json({ message: "No users found." });
         }
@@ -157,7 +158,7 @@ export const getUserFriends = async (req, res) => {
     try {
         const user = await User.findOne({
             username: req.params.username,
-        }).populate("friends", "username email"); //get the user, then get the data of his friends
+        }).populate("friends", "username email img"); //get the user, then get the data of his friends
 
         if (!user) {
             return res.status(404).json({ message: "User not found." });
@@ -240,17 +241,21 @@ export const removeFriend = async (req, res) => {
 // Update an existing user by username
 export const updateUser = async (req, res) => {
     try {
-        const { newUsername, newEmail } = req.body;
+        const { newUsername, newEmail, newImg, newBio } = req.body; 
         const id = req.user._id;
         const updateData = {};
+
         if (newUsername) updateData.username = newUsername;
         if (newEmail) updateData.email = newEmail;
+        if (newImg) updateData.img = newImg;   
+        if (newBio) updateData.bio = newBio;   
 
         const updatedUser = await User.findByIdAndUpdate(id, updateData, {
             new: true,
         });
+
         res.status(201).send({
-            message: "user updated successfully",
+            message: "User updated successfully",
             updatedUser,
         });
     } catch (error) {

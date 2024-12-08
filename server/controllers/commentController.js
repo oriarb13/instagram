@@ -6,7 +6,7 @@ export const getAllComments = async (req, res) => {
     try {
         const comments = await Comment.find().populate(
             "userId",
-            "username email"
+            "username email  img"
         ); //give user data too
         if (comments.length === 0) {
             return res.status(404).json({ message: "No comments found." });
@@ -23,7 +23,7 @@ export const getCommentById = async (req, res) => {
     try {
         const comment = await Comment.findById(req.params.id).populate(
             "userId",
-            "username email"
+            "username email  img"
         );
         if (!comment) {
             return res.status(404).json({ error: "Comment not found." });
@@ -129,7 +129,7 @@ export const getCommentsByPostId = async (req, res) => {
     try {
         const comments = await Comment.find({ postId: req.params.id }).populate(
             "userId",
-            "username email"
+            "username email img"
         );
 
         if (comments.length === 0) {

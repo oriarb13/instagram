@@ -6,8 +6,8 @@ import User from "../models/userModels.js";
 export const getAllPosts = async (req, res) => {
     try {
         const posts = await Post.find()
-            .populate("likedBy", "username email")
-            .populate("posterId", "username");
+            .populate("likedBy", "username email img")
+            .populate("posterId", "username img");
         if (posts.length === 0) {
             return res.status(404).json({ message: "No posts found." });
         }
@@ -22,8 +22,8 @@ export const getAllPosts = async (req, res) => {
 export const getPostById = async (req, res) => {
     try {
         const post = await Post.findById(req.params.id)
-            .populate("likedBy", "username email")
-            .populate("posterId", "username");
+            .populate("likedBy", "username email img")
+            .populate("posterId", "username img");
 
         if (!post) {
             return res.status(404).json({ error: "Post not found." });
@@ -101,8 +101,8 @@ export const getPostsByUsername = async (req, res) => {
         }
 
         const posts = await Post.find({ posterId: user._id })
-            .populate("likedBy", "username email")
-            .populate("posterId", "username");
+            .populate("likedBy", "username email  img")
+            .populate("posterId", "username  img");
 
         if (posts.length === 0) {
             return res
@@ -121,8 +121,7 @@ export const getPostsByUsername = async (req, res) => {
 export const getUsersWhoLikedPost = async (req, res) => {
     try {
         const post = await Post.findById(req.params.id).populate(
-            "likedBy",
-            "username email"
+            "likedBy", "username email  img"
         );
 
         if (!post) {
@@ -152,8 +151,8 @@ export const getPostsFromFriends = async (req, res) => {
         const friendsIds = user.friends.map((friend) => friend._id); //get his friends ids
 
         const posts = await Post.find({ posterId: { $in: friendsIds } }) //if some poster id equal to some id of his friends
-            .populate("likedBy", "username email") //return
-            .populate("posterId", "username");
+            .populate("likedBy", "username email  img") //return
+            .populate("posterId", "username  img");
 
         if (posts.length === 0) {
             return res
