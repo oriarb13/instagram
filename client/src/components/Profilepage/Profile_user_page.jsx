@@ -1,12 +1,13 @@
 import React, { useEffect, useState } from 'react';
-import { Grid, Card, Avatar, Typography, Box, Paper } from '@mui/material';
-import { styled } from '@mui/system';
-import { useSelector } from 'react-redux';
-import { useCheckIfUserValid } from '../../hooks/use-check-if-user-valid';
+import { Grid, Card, Avatar, Typography, Button, Box, Paper } from '@mui/material';
+import { useParams, Link } from 'react-router-dom';
 import { getUserByUsername } from '../../utils/userApi.js';
 import { getPostsByUsername } from '../../utils/postsApi.js';
+import { sendFriendRequest, removeFriend } from '../../utils/userApi.js';
+import { useSelector } from 'react-redux';
 import FriendListModal from './friendlist.jsx';
 import Modal from '@mui/material/Modal';
+import { styled } from '@mui/system';
 
 const ProfileAvatar = styled(Avatar)({
   width: '120px',
@@ -15,26 +16,29 @@ const ProfileAvatar = styled(Avatar)({
   border: '4px solid pink',
 });
 
-const ProfilePage = () => {
-  useCheckIfUserValid();
-
+const ProfileUserPage = () => {
+  const { username } = useParams();
   const [clickedUser, setClickedUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [posts, setPosts] = useState([]);
+  const [reduxUser, setReduxUser] = useState({});
+  const [isFriends, setIsFriends] = useState(false);
   const [openFriendsModal, setOpenFriendsModal] = useState(false);
-
-  const onlineUserFromRedux = useSelector(state => state.user); //redux
+  
+  const onlineUserFromRedux = useSelector(state => state.user);
 
   useEffect(() => {
     const fetchClickedUser = async () => {
       try {
         setLoading(true);
-        const data = await getUserByUsername(onlineUserFromRedux.username);
-        if (data) {
+        const data = await getUserByUsername(username);
+        const data2 = await getUserByUsername(onlineUserFromRedux.username);
+        if (data && data2) {
           setClickedUser(data);
+          setReduxUser(data2);
         } else {
-          setError(data.error || 'Unable to load user data');
+          setError('Unable to load user data');
         }
       } catch (err) {
         setError(err.message || 'Error during fetch');
@@ -43,10 +47,17 @@ const ProfilePage = () => {
       }
     };
 
-    if (onlineUserFromRedux.username) {
+    if (username) {
       fetchClickedUser();
     }
-  }, [onlineUserFromRedux]);
+  }, [username, onlineUserFromRedux.username]);
+
+  useEffect(() => {
+    if (reduxUser && reduxUser.friends && clickedUser) {
+      const isFriend = reduxUser.friends.some(friend => friend.username === clickedUser.username);
+      setIsFriends(isFriend);
+    }
+  }, [reduxUser, clickedUser]);
 
   useEffect(() => {
     if (clickedUser) {
@@ -62,9 +73,41 @@ const ProfilePage = () => {
     }
   }, [clickedUser]);
 
-  // modal
-  const handleOpenFriendsModal = () => setOpenFriendsModal(true);
-  const handleCloseFriendsModal = () => setOpenFriendsModal(false);
+  const handleOnClick = async () => {
+    try {
+      if (isFriends) {
+        await removeFriend(clickedUser._id);
+        setClickedUser(prevState => ({
+          ...prevState,
+          friends: prevState.friends.filter(friend => friend.username !== reduxUser.username),
+        }));
+        setReduxUser(prevState => ({
+          ...prevState,
+          friends: prevState.friends.filter(friend => friend.username !== clickedUser.username),
+        }));
+      } else {
+        await sendFriendRequest(clickedUser._id);
+        setClickedUser(prevState => ({
+          ...prevState,
+          friends: [...prevState.friends, { username: reduxUser.username, _id: reduxUser._id }],
+        }));
+        setReduxUser(prevState => ({
+          ...prevState,
+          friends: [...prevState.friends, { username: clickedUser.username, _id: clickedUser._id }],
+        }));
+      }
+    } catch (err) {
+      setError(err.message || 'Error during friend request');
+    }
+  };
+
+  const handleOpenFriendsModal = () => {
+    setOpenFriendsModal(true);
+  };
+
+  const handleCloseFriendsModal = () => {
+    setOpenFriendsModal(false);
+  };
 
   if (loading) {
     return <div>Loading...</div>;
@@ -138,4 +181,4 @@ const ProfilePage = () => {
   );
 };
 
-export default ProfilePage;
+export default ProfileUserPage;

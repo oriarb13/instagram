@@ -1,5 +1,6 @@
 {
 <<<<<<< HEAD
+<<<<<<< HEAD
   "name": "server",
   "version": "1.0.0",
   "main": "app.js",
@@ -26,6 +27,8 @@
   },
   "description": ""
 =======
+=======
+>>>>>>> b791943ad6b5d1f0d92337e8fcb7955f0f9685b5
     "name": "server",
     "version": "1.0.0",
     "main": "app.js",
@@ -51,5 +54,8 @@
         "react-cookie": "^7.2.2"
     },
     "description": ""
+<<<<<<< HEAD
 >>>>>>> 4bb07bd8754834de7c119aa2ddfcca3e532b66da
+=======
+>>>>>>> b791943ad6b5d1f0d92337e8fcb7955f0f9685b5
 }
