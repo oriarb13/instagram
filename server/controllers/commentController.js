@@ -41,21 +41,22 @@ export const createComment = async (req, res) => {
     const userId = req.user._id;
 
     if (!comContent || !userId || !postId) {
-        return res
-            .status(400)
-            .json({ error: "Content, user, and postId are required." });
+        return res.status(400).json({ error: "Content, user, and postId are required." });
     }
 
     try {
-        const newComment = new Comment({
-            comContent,
-            userId,
-            postId,
-        });
-
+        const newComment = new Comment({ comContent, userId, postId });
         await newComment.save();
 
         const post = await Post.findById(postId);
+        if (!post) {
+            return res.status(404).json({ error: "Post not found" });
+        }
+
+        if (!post.comments) {
+            post.comments = [];
+        }
+
         post.comments.push(newComment._id);
         await post.save();
 
@@ -68,6 +69,7 @@ export const createComment = async (req, res) => {
         res.status(500).json({ error: "Server error." });
     }
 };
+
 
 // Update a comment
 export const updateComment = async (req, res) => {

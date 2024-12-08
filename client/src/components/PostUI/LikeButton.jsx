@@ -16,28 +16,30 @@ export default function LikeButton({
         setLikeLoading(true);
 
         const alreadyLiked = likedBy.includes(currentUserId);
+
         const updatedLikes = alreadyLiked
             ? likedBy.filter((userId) => userId !== currentUserId)
             : [...likedBy, currentUserId];
 
-        setLikedBy(updatedLikes); // Optimistically update
+        setLikedBy(updatedLikes);
+
+        const isUserLike = !alreadyLiked;
 
         try {
             const response = await toggleLikePost(postId);
             if (response.post) {
-                setLikedBy(response.post.likedBy); // Sync with server response
-                onUpdate?.(response.post.likedBy); // Notify parent if needed
+                setLikedBy(response.post.likedBy); 
+                onUpdate?.(response.post.likedBy); 
             }
         } catch (error) {
             console.error("Error toggling like:", error);
-            // Revert on failure
-            setLikedBy(
-                alreadyLiked ? [...likedBy, currentUserId] : updatedLikes
-            );
+            setLikedBy(alreadyLiked ? likedBy : updatedLikes);
         } finally {
             setLikeLoading(false);
         }
     };
+
+    const isUserLike = likedBy.includes(currentUserId);
 
     return (
         <IconButton
@@ -47,7 +49,7 @@ export default function LikeButton({
         >
             <FavoriteIcon
                 sx={{
-                    color: likedBy.includes(currentUserId) ? "red" : "gray",
+                    color: isUserLike ? "red" : "gray", 
                 }}
             />
         </IconButton>
