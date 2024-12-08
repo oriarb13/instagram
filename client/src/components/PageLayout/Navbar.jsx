@@ -16,10 +16,11 @@ import Button from "@mui/material/Button";
 import Tooltip from "@mui/material/Tooltip";
 import MenuItem from "@mui/material/MenuItem";
 import AdbIcon from "@mui/icons-material/Adb";
-import Logout from "./Logout"; // הייבוא של הקומפוננטה
+import DeleteUser from "./DeleteUser.jsx";
+import Logout from "./Logout.jsx"; 
 
 const pages = ["home", "Discover", "Search", "Create Post"];
-const settings = ["Profile", "Logout"]; // שינוי פה - עכשיו הלוגאאוט מתבצע בקומפוננטה Logout
+const settings = ["Profile", "Logout","DeleteUser"]; 
 
 function NavBar() {
     const [anchorElNav, setAnchorElNav] = React.useState(null);
@@ -185,27 +186,27 @@ function NavBar() {
                         >
                             {settings.map((setting) => (
                                 <MenuItem
-                                    key={setting}
-                                    onClick={handleCloseUserMenu}
-                                    component={Link}
-                                    to={
-                                        setting === "Logout"
-                                            ? "/login" // הכפתור יהיה מותאם ללוגאאוט
-                                            : `/${setting
-                                                  .toLowerCase()
-                                                  .replace(" ", "-")}`
-                                    }
-                                >
-                                    {setting === "Logout" ? (
-                                        <Logout /> // הוספת קומפוננטת ה-Logout במקום כפתור
-                                    ) : (
-                                        <Typography
-                                            sx={{ textAlign: "center" }}
-                                        >
-                                            {setting}
-                                        </Typography>
-                                    )}
-                                </MenuItem>
+                                key={setting}
+                                onClick={handleCloseUserMenu}
+                                component={Link}
+                                to={
+                                    setting === "Logout"
+                                        ? "/login"
+                                        : setting === "DeleteUser"
+                                        ? "/login" 
+                                        : `/${setting.toLowerCase().replace(" ", "-")}`
+                                }
+                            >
+                                {setting === "Logout" ? (
+                                    <Logout />
+                                ) : setting === "DeleteUser" ? (
+                                    <DeleteUser />  
+                                ) : (
+                                    <Typography sx={{ textAlign: "center" }}>
+                                        {setting}
+                                    </Typography>
+                                )}
+                            </MenuItem>
                             ))}
                         </Menu>
                     </Box>
