@@ -97,12 +97,12 @@ const HomePage = () => {
                 p: 4,
             }}
         >
-            <Paper elevation={3} sx={{ p: 4, borderRadius: 2 }}>
+            <Paper elevation={3} sx={{bgcolor: 'grey', p: 4, borderRadius: 2 }}>
                 <Typography
                     variant="h4"
                     align="center"
                     gutterBottom
-                    sx={{ fontWeight: "bold", color: "primary.main" }}
+                    sx={{ fontWeight: "bold", color: "silver" }}
                 >
                     Friends' Posts
                 </Typography>

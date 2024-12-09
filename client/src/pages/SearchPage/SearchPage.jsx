@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { getAllUsers } from "../../utils/userApi";
 import { getAllPosts } from "../../utils/postsApi";
 import { Link } from "react-router-dom";
-import { TextField, Select, MenuItem, FormControl, InputLabel, Box, Typography, Grid, useMediaQuery, Container, Avatar } from "@mui/material";
+import { TextField, Select, MenuItem,Paper, FormControl, InputLabel, Box, Typography, Grid, useMediaQuery, Container, Avatar } from "@mui/material";
 import { stringAvatar } from "../../utils/avatarStyler";
 import PostCard from "../../components/PostUI/Post";
 
@@ -63,8 +63,10 @@ const SearchPage = () => {
 
     return (
         <Container maxWidth="md">
+                        <Paper  elevation={3} sx={{bgcolor: 'grey', p: 4, borderRadius: 2 }}>
+
             <Box sx={{ padding: 3 }}>
-                <Typography variant="h4" gutterBottom align="center">
+                <Typography variant="h4" gutterBottom align="center" color="silver">
                     Search Page
                 </Typography>
 
@@ -142,6 +144,7 @@ const SearchPage = () => {
                     )
                 )}
             </Box>
+            </Paper>
         </Container>
     );
 };

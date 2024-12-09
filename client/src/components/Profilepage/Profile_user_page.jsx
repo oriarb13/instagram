@@ -6,24 +6,30 @@ import {
     Typography,
     Button,
     Box,
-    Paper,
+    Modal,
+    useMediaQuery,
+    Container,
+    Paper
 } from "@mui/material";
-import { useParams, Link, useNavigate } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { getUserByUsername } from "../../utils/userApi.js";
 import { getPostsByUsername } from "../../utils/postsApi.js";
 import { sendFriendRequest, removeFriend } from "../../utils/userApi.js";
 import { useSelector } from "react-redux";
 import FriendListModal from "./friendlist.jsx";
-import Modal from "@mui/material/Modal";
 import { styled } from "@mui/system";
-import PostCard from "../PostUI/Post.jsx";
+import PostsList from "../PostUI/Posts.jsx";
 
-const ProfileAvatar = styled(Avatar)({
+const ProfileAvatar = styled(Avatar)(({ theme }) => ({
     width: "120px",
     height: "120px",
     margin: "auto",
     border: "4px solid pink",
-});
+    [theme.breakpoints.down("sm")]: {
+        width: "100px",
+        height: "100px",
+    },
+}));
 
 const ProfileUserPage = () => {
     const navigate = useNavigate();
@@ -32,11 +38,12 @@ const ProfileUserPage = () => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [posts, setPosts] = useState([]);
-    const [reduxUser, setReduxUser] = useState({});
+    const [reduxUser, setReduxUser] = useState({ friends: [] });
     const [isFriends, setIsFriends] = useState(false);
     const [openFriendsModal, setOpenFriendsModal] = useState(false);
 
     const onlineUserFromRedux = useSelector((state) => state.user);
+    const isMobile = useMediaQuery("(max-width:600px)");
 
     if (username === onlineUserFromRedux.username) {
         navigate("/profile");
@@ -47,12 +54,10 @@ const ProfileUserPage = () => {
             try {
                 setLoading(true);
                 const data = await getUserByUsername(username);
-                const data2 = await getUserByUsername(
-                    onlineUserFromRedux.username
-                );
+                const data2 = await getUserByUsername(onlineUserFromRedux.username);
                 if (data && data2) {
                     setClickedUser(data);
-                    setReduxUser(data2);
+                    setReduxUser({ friends: data2.friends || [] });
                 } else {
                     setError("Unable to load user data");
                 }
@@ -81,9 +86,7 @@ const ProfileUserPage = () => {
         if (clickedUser) {
             const fetchPosts = async () => {
                 try {
-                    const postsData = await getPostsByUsername(
-                        clickedUser.username
-                    );
+                    const postsData = await getPostsByUsername(clickedUser.username);
                     setPosts(postsData);
                 } catch (err) {
                     setError(err.message || "Error fetching posts");
@@ -97,52 +100,40 @@ const ProfileUserPage = () => {
         try {
             if (isFriends) {
                 await removeFriend(clickedUser._id);
-    
                 setClickedUser((prevState) => ({
                     ...prevState,
-                    friends: Array.isArray(prevState.friends) ? prevState.friends.filter(
-                        (friend) => friend.username !== reduxUser.username
-                    ) : [],
+                    friends: Array.isArray(prevState.friends)
+                        ? prevState.friends.filter((friend) => friend.username !== reduxUser.username)
+                        : [], 
                 }));
-    
                 setReduxUser((prevState) => ({
                     ...prevState,
-                    friends: Array.isArray(prevState.friends) ? prevState.friends.filter(
-                        (friend) => friend.username !== clickedUser.username
-                    ) : [],
+                    friends: Array.isArray(prevState.friends)
+                        ? prevState.friends.filter((friend) => friend.username !== clickedUser.username)
+                        : [], 
                 }));
             } else {
                 await sendFriendRequest(clickedUser._id);
-    
                 setClickedUser((prevState) => ({
                     ...prevState,
-                    friends: Array.isArray(prevState.friends) ? [
-                        ...prevState.friends,
-                        { username: reduxUser.username, _id: reduxUser._id },
-                    ] : [{ username: reduxUser.username, _id: reduxUser._id }],
+                    friends: Array.isArray(prevState.friends)
+                        ? [...prevState.friends, { username: reduxUser.username, _id: reduxUser._id }]
+                        : [{ username: reduxUser.username, _id: reduxUser._id }],
                 }));
-    
                 setReduxUser((prevState) => ({
                     ...prevState,
-                    friends: Array.isArray(prevState.friends) ? [
-                        ...prevState.friends,
-                        { username: clickedUser.username, _id: clickedUser._id },
-                    ] : [{ username: clickedUser.username, _id: clickedUser._id }],
+                    friends: Array.isArray(prevState.friends)
+                        ? [...prevState.friends, { username: clickedUser.username, _id: clickedUser._id }]
+                        : [{ username: clickedUser.username, _id: clickedUser._id }], 
                 }));
             }
         } catch (err) {
             setError(err.message || "Error during friend request");
         }
     };
-    
 
-    const handleOpenFriendsModal = () => {
-        setOpenFriendsModal(true);
-    };
-
-    const handleCloseFriendsModal = () => {
-        setOpenFriendsModal(false);
-    };
+    const handleOpenFriendsModal = () => setOpenFriendsModal(true);
+    const handleCloseFriendsModal = () => setOpenFriendsModal(false);
 
     if (loading) {
         return <div>Loading...</div>;
@@ -153,45 +144,43 @@ const ProfileUserPage = () => {
     }
 
     return (
-        <Box sx={{ marginTop: 50, padding: 3 }}>
-            <Grid container spacing={3}>
-                <Grid item xs={12} md={4}>
-                    <Card sx={{ padding: 2, textAlign: "center" }}>
-                        <ProfileAvatar
-                            alt={clickedUser.username}
-                            src={clickedUser.img}
-                        />
-                        <Typography variant="h6" sx={{ marginTop: 1 }}>
+        
+        <Box sx={{ marginTop: 1, }}>
+
+<Container
+            maxWidth="lg"
+            sx={{
+                mt: 4,
+                borderRadius: 2,
+                p: 4,
+            }}
+        >
+            <Paper elevation={3} sx={{bgcolor:"grey", p: 12, borderRadius: 2 }}>
+
+            <Grid container spacing={12} sx={{ display: "flex", flexDirection: "column" }}>
+                <Grid item xs={12} md={12}>
+                    <Card sx={{bgcolor:"silver", padding: 6, paddingInline: "2", textAlign: "center", display: "flex", flexDirection: "column", justifyContent: "center" }}>
+                        <ProfileAvatar alt={clickedUser.username} src={clickedUser.img} />
+                        <Typography variant="h4" sx={{ marginTop: 2 }}>
                             {clickedUser.username}
                         </Typography>
-
-                        <Typography variant="body2" color="text.secondary">
+                        <Typography variant="body1" color="text.secondary" sx={{ marginBottom: 2 }}>
                             @{clickedUser.username}
                         </Typography>
 
-                        <Box
-                            sx={{
-                                marginTop: 2,
-                                display: "flex",
-                                justifyContent: "space-around",
-                            }}
-                        >
+                        <Typography variant="body2" color="text.secondary" sx={{ marginTop: '10px' }}>
+                            bio: {clickedUser.bio || 'hey'}
+                        </Typography>
+
+                        <Box sx={{ marginTop: 3, display: "flex", justifyContent: "space-around", gap: 8 }}>
                             <Box>
-                                <Typography variant="h6">
-                                    {posts.length}
-                                </Typography>
-                                <Typography
-                                    variant="body2"
-                                    color="text.secondary"
-                                >
+                                <Typography variant="h5">{posts.length}</Typography>
+                                <Typography variant="body2" color="text.secondary">
                                     Posts
                                 </Typography>
                             </Box>
-
                             <Box>
-                                <Typography variant="h6">
-                                    {clickedUser.friends.length}
-                                </Typography>
+                                <Typography variant="h5">{clickedUser.friends.length}</Typography>
                                 <Typography
                                     variant="body2"
                                     color="text.secondary"
@@ -208,11 +197,7 @@ const ProfileUserPage = () => {
                                     Friends
                                 </Typography>
                             </Box>
-
-                            {onlineUserFromRedux.username ===
-                            clickedUser.username ? (
-                                <div></div>
-                            ) : (
+                            {onlineUserFromRedux.username !== clickedUser.username && (
                                 <Button
                                     variant="outlined"
                                     sx={{
@@ -232,22 +217,9 @@ const ProfileUserPage = () => {
                     </Card>
                 </Grid>
 
-                <Grid item xs={12} md={8}>
-                    <Grid container spacing={2}>
-                        {posts.map((post) => (
-                            <Grid item xs={6} sm={4} md={3} key={post._id}>
-                                <Paper
-                                    sx={{
-                                        height: 200,
-                                        backgroundColor: "#f0f0f0",
-                                    }}
-                                >
-                                    <PostCard post={post}></PostCard>
-                                </Paper>
-                            </Grid>
-                        ))}
-                    </Grid>
-                </Grid>
+                <Box marginLeft={8} display="flex" justifyContent="center">
+                    <PostsList posts={posts} />
+                </Box>
             </Grid>
 
             <Modal open={openFriendsModal} onClose={handleCloseFriendsModal}>
@@ -256,13 +228,16 @@ const ProfileUserPage = () => {
                         padding: 2,
                         backgroundColor: "black",
                         margin: "auto",
-                        marginTop: "50%",
-                        maxWidth: "200px",
+                        marginTop: "20%",
+                        maxWidth: "300px",
                     }}
                 >
                     <FriendListModal friends={clickedUser.friends} />
                 </Box>
             </Modal>
+
+            </Paper>
+            </Container>
         </Box>
     );
 };

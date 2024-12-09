@@ -6,7 +6,7 @@ import CreatePost from "../../components/CreatePost/CreatePost.jsx";
 const CreatePostPage = () => {
     return (
         <Container maxWidth="md" sx={{ mt: 4 }}>
-            <Paper elevation={3} sx={{ padding: 4, borderRadius: 2 }}>
+            <Paper  elevation={3} sx={{bgcolor:"grey", padding: 4, borderRadius: 2 }}>
                 <Typography
                     variant="h4"
                     align="center"
