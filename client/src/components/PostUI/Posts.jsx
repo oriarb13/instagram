@@ -2,7 +2,13 @@ import React from "react";
 import { Stack, Typography, Box } from "@mui/material";
 import PostCard from "./Post.jsx";
 
-export default function PostsList({ posts = [] }) {
+export default function PostsList({ posts = [], setPosts }) {
+    const handleDeletePost = (postId) => {
+        setPosts((prevPosts) =>
+            prevPosts.filter((post) => post._id !== postId)
+        );
+    };
+
     if (posts.length === 0) {
         return (
             <Typography variant="body2" color="text.secondary">
@@ -15,7 +21,6 @@ export default function PostsList({ posts = [] }) {
         <Box
             sx={{
                 width: "80%",
-
                 display: "flex",
                 justifyContent: "center",
                 marginBlock: 2,
@@ -27,6 +32,7 @@ export default function PostsList({ posts = [] }) {
                         key={post._id}
                         post={post}
                         comments={post.comments || []}
+                        onDeletePost={handleDeletePost} // Pass delete handler
                     />
                 ))}
             </Stack>

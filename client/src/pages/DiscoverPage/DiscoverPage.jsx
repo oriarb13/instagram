@@ -87,7 +87,7 @@ export default function DiscoveryPage() {
                     Explore the latest posts and join the conversation!
                 </Typography>
                 <Box display="flex" justifyContent="center">
-                    <PostsList posts={posts} />
+                    <PostsList posts={posts} setPosts={setPosts} />
                 </Box>
             </Paper>
         </Container>

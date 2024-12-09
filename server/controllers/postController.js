@@ -66,30 +66,60 @@ export const createPost = async (req, res) => {
 };
 
 // Delete a post by ID
+import mongoose from "mongoose";
+
 export const deletePost = async (req, res) => {
     const { id } = req.params;
-    const userId = req.user._id;
+    const userId = new mongoose.Types.ObjectId(req.user._id); // Use 'new'
     const postById = await Post.findById(id);
+
     if (!postById) {
-        return res.status(404).send({ error: "post not found" });
+        return res.status(404).send({ error: "Post not found" });
     }
+
     if (userId.equals(postById.posterId)) {
         try {
-            const deletePost = await Post.findByIdAndDelete(id);
+            const deletedPost = await Post.findByIdAndDelete(id);
             res.status(200).send({
-                message: "post deleted successfully",
-                deletePost,
+                message: "Post deleted successfully",
+                deletedPost,
             });
         } catch (error) {
-            console.error("Error finding post by ID:", error);
+            console.error("Error deleting post by ID:", error);
             res.status(500).json({ error: "Server error" });
         }
-    } else
-        res.status(400).send({
+    } else {
+        res.status(403).send({
             status: "failed",
-            mes: "only user that created the post can delete him",
+            message: "Only the user who created the post can delete it.",
         });
+    }
 };
+
+// export const deletePost = async (req, res) => {
+//     const { id } = req.params;
+//     const userId = req.user._id;
+//     const postById = await Post.findById(id);
+//     if (!postById) {
+//         return res.status(404).send({ error: "post not found" });
+//     }
+//     if (userId.equals(postById.posterId)) {
+//         try {
+//             const deletePost = await Post.findByIdAndDelete(id);
+//             res.status(200).send({
+//                 message: "post deleted successfully",
+//                 deletePost,
+//             });
+//         } catch (error) {
+//             console.error("Error finding post by ID:", error);
+//             res.status(500).json({ error: "Server error" });
+//         }
+//     } else
+//         res.status(400).send({
+//             status: "failed",
+//             mes: "only user that created the post can delete him",
+//         });
+// };
 
 // posts by username
 export const getPostsByUsername = async (req, res) => {
@@ -121,7 +151,8 @@ export const getPostsByUsername = async (req, res) => {
 export const getUsersWhoLikedPost = async (req, res) => {
     try {
         const post = await Post.findById(req.params.id).populate(
-            "likedBy", "username email  img"
+            "likedBy",
+            "username email  img"
         );
 
         if (!post) {
@@ -189,7 +220,7 @@ export const toggleLikePost = async (req, res) => {
         await post.save();
         res.status(200).json({
             message: "Post like toggled successfully.",
-            post, 
+            post,
         });
     } catch (error) {
         console.error("Error toggling like:", error);

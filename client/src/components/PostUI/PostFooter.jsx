@@ -1,5 +1,11 @@
 import React, { useState, useEffect } from "react";
-import { Box, CardActions, Collapse, CardContent, Typography } from "@mui/material/";
+import {
+    Box,
+    CardActions,
+    Collapse,
+    CardContent,
+    Typography,
+} from "@mui/material/";
 import { getCommentsByPostId } from "../../utils/commentsApi";
 import CommentHeader from "../CommentsUI/CommentHeader.jsx";
 import AddComment from "../CommentsUI/AddComment.jsx";
@@ -17,8 +23,9 @@ export default function PostFooter({ post, comments = [] }) {
     useEffect(() => {
         const fetchComments = async () => {
             const data = await getCommentsByPostId(post._id);
-            
+
             if (data.success) {
+                console.log("Fetched comments:", data.comments);
                 setLocalComments(data.comments);
             } else {
                 console.error("Failed to load comments:", data?.error);
@@ -35,11 +42,14 @@ export default function PostFooter({ post, comments = [] }) {
     const handleLikesUpdate = (updatedLikes) => {
         setLikedBy(updatedLikes);
     };
-
+    const handleDeleteComment = (commentId) => {
+        setLocalComments((prevComments) =>
+            prevComments.filter((comment) => comment._id !== commentId)
+        );
+    };
     const handleExpandClick = () => {
         setExpanded(!expanded);
     };
-
     return (
         <Box>
             <CardActions disableSpacing>
@@ -64,16 +74,27 @@ export default function PostFooter({ post, comments = [] }) {
             <Collapse in={expanded} timeout="auto" unmountOnExit>
                 <AddComment
                     postId={post._id}
-                    onCommentAdded={(newComment) =>
-                        setLocalComments((prev) => [...prev, newComment])
-                    }
+                    onCommentAdded={(newComment) => {
+                        const enrichedComment = {
+                            ...newComment,
+                            userId: {
+                                username: post.posterId?.username, // Add username
+                                img: post.posterId?.img, // Add profile image
+                            },
+                        };
+                        setLocalComments((prev) => [...prev, enrichedComment]);
+                    }}
                 />
+
                 {localComments && localComments.length > 0 ? (
                     localComments.map((comment) => (
                         <CardContent key={comment._id}>
                             <CommentHeader
                                 username={comment.userId?.username}
                                 createdAt={comment.createdAt}
+                                img={comment.userId?.img}
+                                commentId={comment._id}
+                                onDeleteComment={handleDeleteComment}
                             />
                             <Typography sx={{ marginBottom: 2 }}>
                                 {comment.comContent || "No content available"}
