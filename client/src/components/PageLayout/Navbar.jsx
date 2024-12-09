@@ -132,11 +132,11 @@ function NavBar() {
                             fontFamily: "monospace",
                             fontWeight: 700,
                             letterSpacing: ".3rem",
-                            color: "hsl(0, 0%, 7%)",
+                            color: "white",
                             textDecoration: "none",
                         }}
                     >
-                        LOGO
+                        white nights
                     </Typography>
                     <Box
                         sx={{
@@ -163,7 +163,7 @@ function NavBar() {
                                 sx={{ p: 0 }}
                             >
                                 <Avatar
-                                    alt="Remy Sharp"
+                                    alt="oemy Sharp"
                                     src="/static/images/avatar/2.jpg"
                                 />
                             </IconButton>

@@ -79,12 +79,12 @@ export default function DiscoveryPage() {
                 p: 4,
             }}
         >
-            <Paper elevation={3} sx={{ p: 4, borderRadius: 2 }}>
+            <Paper  elevation={3} sx={{bgcolor: 'grey', p: 4, borderRadius: 2 }}>
                 <Typography
                     variant="h4"
                     align="center"
                     gutterBottom
-                    sx={{ fontWeight: "bold", color: "primary.main" }}
+                    sx={{ fontWeight: "bold", color: "silver" }}
                 >
                     Discover New Posts
                 </Typography>
@@ -96,7 +96,7 @@ export default function DiscoveryPage() {
                     Explore the latest posts and join the conversation!
                 </Typography>
                 <Box display="flex" justifyContent="center">
-                    <PostsList posts={posts} />
+                    <PostsList posts={posts} setPosts={setPosts} />
                 </Box>
             </Paper>
         </Container>

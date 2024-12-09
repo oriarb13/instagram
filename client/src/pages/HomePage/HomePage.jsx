@@ -114,7 +114,7 @@ const HomePage = () => {
                     See what your friends are sharing!
                 </Typography>
                 <Box display="flex" justifyContent="center">
-                    <PostsList posts={posts} />
+                    <PostsList posts={posts} setPosts={setPosts} />
                 </Box>
             </Paper>
         </Container>

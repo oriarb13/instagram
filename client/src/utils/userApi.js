@@ -164,3 +164,14 @@ export const removeFriend = async (targetUserId) => {
         return { success: false, error: error.response?.data || error.message };
     }
 };
+
+
+//all users
+export const getAllUsers = async () => {
+    try {
+        const response = await axios.get(`${base_url}/api/users/`);
+        return response.data;
+    } catch (error) {
+        return { success: false, error: error.response?.data || error.message };
+    }
+};

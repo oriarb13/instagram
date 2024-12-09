@@ -1,5 +1,11 @@
 import React, { useState, useEffect } from "react";
-import { Box, CardActions, Collapse, CardContent, Typography } from "@mui/material/";
+import {
+    Box,
+    CardActions,
+    Collapse,
+    CardContent,
+    Typography,
+} from "@mui/material/";
 import { getCommentsByPostId } from "../../utils/commentsApi";
 import CommentHeader from "../CommentsUI/CommentHeader.jsx";
 import AddComment from "../CommentsUI/AddComment.jsx";
@@ -9,21 +15,26 @@ import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import ExpandMore from "@mui/material/IconButton";
 import FavoriteIcon from "@mui/icons-material/Favorite";
 
+
 export default function PostFooter({ post, comments = [] }) {
     const [likedBy, setLikedBy] = useState(post.likedBy || []);
     const [expanded, setExpanded] = useState(false);
     const [localComments, setLocalComments] = useState(comments);
 
+
     useEffect(() => {
         const fetchComments = async () => {
             const data = await getCommentsByPostId(post._id);
-            
+
+
             if (data.success) {
+                console.log("Fetched comments:", data.comments);
                 setLocalComments(data.comments);
             } else {
                 console.error("Failed to load comments:", data?.error);
             }
         };
+
 
         if (comments.length === 0) {
             fetchComments();
@@ -32,14 +43,18 @@ export default function PostFooter({ post, comments = [] }) {
         }
     }, [post._id]);
 
+
     const handleLikesUpdate = (updatedLikes) => {
         setLikedBy(updatedLikes);
     };
-
+    const handleDeleteComment = (commentId) => {
+        setLocalComments((prevComments) =>
+            prevComments.filter((comment) => comment._id !== commentId)
+        );
+    };
     const handleExpandClick = () => {
         setExpanded(!expanded);
     };
-
     return (
         <Box>
             <CardActions disableSpacing>
@@ -64,16 +79,28 @@ export default function PostFooter({ post, comments = [] }) {
             <Collapse in={expanded} timeout="auto" unmountOnExit>
                 <AddComment
                     postId={post._id}
-                    onCommentAdded={(newComment) =>
-                        setLocalComments((prev) => [...prev, newComment])
-                    }
+                    onCommentAdded={(newComment) => {
+                        const enrichedComment = {
+                            ...newComment,
+                            userId: {
+                                username: post.posterId?.username, // Add username
+                                img: post.posterId?.img, // Add profile image
+                            },
+                        };
+                        setLocalComments((prev) => [...prev, enrichedComment]);
+                    }}
                 />
+
+
                 {localComments && localComments.length > 0 ? (
                     localComments.map((comment) => (
                         <CardContent key={comment._id}>
                             <CommentHeader
                                 username={comment.userId?.username}
                                 createdAt={comment.createdAt}
+                                img={comment.userId?.img}
+                                commentId={comment._id}
+                                onDeleteComment={handleDeleteComment}
                             />
                             <Typography sx={{ marginBottom: 2 }}>
                                 {comment.comContent || "No content available"}
@@ -94,3 +121,6 @@ export default function PostFooter({ post, comments = [] }) {
         </Box>
     );
 }
+
+
+
