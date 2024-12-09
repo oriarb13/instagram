@@ -97,12 +97,12 @@ const HomePage = () => {
                 p: 4,
             }}
         >
-            <Paper elevation={3} sx={{bgcolor: 'grey', p: 4, borderRadius: 2 }}>
+            <Paper elevation={3} sx={{ p: 4, borderRadius: 2 }}>
                 <Typography
                     variant="h4"
                     align="center"
                     gutterBottom
-                    sx={{ fontWeight: "bold", color: "silver" }}
+                    sx={{ fontWeight: "bold", color: "primary.main" }}
                 >
                     Friends' Posts
                 </Typography>
@@ -114,7 +114,7 @@ const HomePage = () => {
                     See what your friends are sharing!
                 </Typography>
                 <Box display="flex" justifyContent="center">
-                    <PostsList posts={posts} />
+                    <PostsList posts={posts} setPosts={setPosts} />
                 </Box>
             </Paper>
         </Container>
