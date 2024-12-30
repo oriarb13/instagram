@@ -11,13 +11,11 @@ import {
     Paper,
 } from "@mui/material";
 
-
 const HomePage = () => {
     const username = useSelector((state) => state.user.username); // Get the current username
     const [posts, setPosts] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
-
 
     useEffect(() => {
         async function fetchData() {
@@ -27,10 +25,8 @@ const HomePage = () => {
                 return;
             }
 
-
             try {
                 console.log("Fetching posts for username:", username);
-
 
                 // Fetch posts for the current user
                 const response = await fetch(
@@ -40,9 +36,7 @@ const HomePage = () => {
                     throw new Error("Failed to fetch posts from friends.");
                 }
 
-
                 const friendsPosts = await response.json();
-
 
                 const postsWithComments = await Promise.all(
                     friendsPosts.map(async (post) => {
@@ -54,7 +48,6 @@ const HomePage = () => {
                     })
                 );
 
-
                 setPosts(postsWithComments);
             } catch (err) {
                 console.error("Error fetching posts or comments:", err);
@@ -64,10 +57,8 @@ const HomePage = () => {
             }
         }
 
-
         fetchData();
     }, [username]);
-
 
     if (loading)
         return (
@@ -79,14 +70,12 @@ const HomePage = () => {
             </Container>
         );
 
-
     if (error)
         return (
             <Container maxWidth="md" sx={{ mt: 4 }}>
                 <Alert severity="error">{error}</Alert>
             </Container>
         );
-
 
     return (
         <Container
@@ -95,9 +84,17 @@ const HomePage = () => {
                 mt: 4,
                 borderRadius: 2,
                 p: 4,
+                background: "linear-gradient(135deg, #e0f7fa, #e0e0e0)",
             }}
         >
-            <Paper elevation={3} sx={{ p: 4, borderRadius: 2 }}>
+            <Paper
+                elevation={3}
+                sx={{
+                    p: 4,
+                    borderRadius: 2,
+                    background: "linear-gradient(135deg, #f8f9fa, #e9ecef)", // New gradient background color
+                }}
+            >
                 <Typography
                     variant="h4"
                     align="center"
@@ -121,8 +118,4 @@ const HomePage = () => {
     );
 };
 
-
 export default HomePage;
-
-
-

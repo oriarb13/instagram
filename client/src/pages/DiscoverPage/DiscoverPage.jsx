@@ -11,18 +11,15 @@ import {
     Paper,
 } from "@mui/material";
 
-
 export default function DiscoveryPage() {
     const [posts, setPosts] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
-
     useEffect(() => {
         async function fetchData() {
             try {
                 const allPosts = await getAllPosts();
-
 
                 const postsWithComments = await Promise.all(
                     allPosts.map(async (post) => {
@@ -34,7 +31,6 @@ export default function DiscoveryPage() {
                     })
                 );
 
-
                 setPosts(postsWithComments);
             } catch (err) {
                 console.error("Error fetching posts or comments:", err);
@@ -44,10 +40,8 @@ export default function DiscoveryPage() {
             }
         }
 
-
         fetchData();
     }, []);
-
 
     if (loading)
         return (
@@ -59,7 +53,6 @@ export default function DiscoveryPage() {
             </Container>
         );
 
-
     if (error)
         return (
             <Container maxWidth="md" sx={{ mt: 4 }}>
@@ -67,24 +60,29 @@ export default function DiscoveryPage() {
             </Container>
         );
 
-
     return (
         <Container
             maxWidth="lg"
             sx={{
                 mt: 4,
-
-
-                borderRadius: 2,
                 p: 4,
+                borderRadius: 2,
+                background: "linear-gradient(to bottom, #f5f7fa, #e2eafc)",
             }}
         >
-            <Paper  elevation={3} sx={{bgcolor: 'grey', p: 4, borderRadius: 2 }}>
+            <Paper
+                elevation={3}
+                sx={{
+                    p: 4,
+                    borderRadius: 2,
+                    background: "linear-gradient(to bottom, #d6e4f0, #aecde8)",
+                }}
+            >
                 <Typography
                     variant="h4"
                     align="center"
                     gutterBottom
-                    sx={{ fontWeight: "bold", color: "silver" }}
+                    sx={{ fontWeight: "bold", color: "#3f51b5" }}
                 >
                     Discover New Posts
                 </Typography>
@@ -95,13 +93,25 @@ export default function DiscoveryPage() {
                 >
                     Explore the latest posts and join the conversation!
                 </Typography>
-                <Box display="flex" justifyContent="center">
-                    <PostsList posts={posts} setPosts={setPosts} />
-                </Box>
+                {posts.length === 0 ? (
+                    <Typography
+                        variant="body1"
+                        align="center"
+                        sx={{ color: "text.secondary", mt: 4 }}
+                    >
+                        No posts available at the moment. Check back later!
+                    </Typography>
+                ) : (
+                    <Box
+                        display="flex"
+                        justifyContent="center"
+                        flexWrap="wrap"
+                        gap={3}
+                    >
+                        <PostsList posts={posts} setPosts={setPosts} />
+                    </Box>
+                )}
             </Paper>
         </Container>
     );
 }
-
-
-
